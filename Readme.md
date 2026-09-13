@@ -1,16 +1,16 @@
-# SonarGuard 🌊🛥️
+# NEMO 🌊🛥️
 ### AI-Powered Automated Underwater Marine Debris & Anomaly Detection
 
-**SonarGuard** is an end-to-end automated computer vision pipeline designed to ingest Side-Scan Sonar (SSS) imagery, identify man-made debris (such as ghost nets, shipwrecks, and pipelines) against complex natural backgrounds, and generate actionable localized data.
+**NEMO** is an end-to-end automated computer vision pipeline designed to ingest Side-Scan Sonar (SSS) imagery, identify man-made debris (such as ghost nets, shipwrecks, and pipelines) against complex natural backgrounds, and generate actionable localized data.
 
-Designed for the **Smart India Hackathon (SIH)**, SonarGuard leverages state-of-the-art 2025 acoustic computer vision research to deliver a highly accurate, edge-optimized application for marine conservationists and naval operators.
+Designed for the **Smart India Hackathon (SIH)**, NEMO leverages state-of-the-art 2025 acoustic computer vision research to deliver a highly accurate, edge-optimized application for marine conservationists and naval operators.
 
 ---
 
 ## 🚀 Core Innovation: The RCDI-YOLO Engine
 Traditional sonar object detection suffers from high false-positive rates due to acoustic shadows, seabed clutter, and speckle noise. 
 
-SonarGuard abandons slow, multi-stage verification pipelines in favor of a customized **RCDI-YOLO** architecture. Based on cutting-edge research, we modified the YOLOv8 backbone with advanced neural modules to natively handle sonar physics:
+NEMO abandons slow, multi-stage verification pipelines in favor of a customized **RCDI-YOLO** architecture. Based on cutting-edge research, we modified the YOLOv8 backbone with advanced neural modules to natively handle sonar physics:
 *   **LANConvNeXtv2:** Extracts multi-scale, low-contrast seabed features natively, replacing manual texture analysis.
 *   **Dysample:** Dynamically adapts the network's upsampling rate based on target size, maintaining robust detection across varying spatial resolutions.
 *   **ImplicitHead:** Utilizes implicit feature representations to natively filter background noise and distinguish true artificial targets from natural marine formations (rocks, ridges) without a secondary classifier.
@@ -46,8 +46,8 @@ SonarGuard abandons slow, multi-stage verification pipelines in favor of a custo
 ### 1. Environment Setup
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/SonarGuard.git
-cd SonarGuard
+git clone https://github.com/your-org/NEMO.git
+cd NEMO
 
 # Create a virtual environment
 python -m venv venv
