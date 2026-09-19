@@ -386,7 +386,12 @@ class RCDIYOLOModel(nn.Module):
                 "See README.md for details."
             )
         state = torch.load(weights_path, map_location="cpu")
-        if isinstance(state, dict) and "model" in state:
-            state = state["model"]
+        if isinstance(state, dict):
+            if "model" in state:
+                state = state["model"]
+            elif "state_dict" in state:
+                state = state["state_dict"]
+        if hasattr(state, "state_dict"):
+            state = state.state_dict()
         self.load_state_dict(state, strict=False)
         logger.info("Loaded weights from: %s", weights_path)
