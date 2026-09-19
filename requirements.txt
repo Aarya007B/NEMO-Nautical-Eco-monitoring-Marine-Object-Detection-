@@ -1,0 +1,33 @@
+# SonarGuard / NEMO — Python Requirements
+# Install: pip install -r requirements.txt
+
+# Deep learning
+torch>=2.1.0
+torchvision>=0.16.0
+
+# Computer vision
+opencv-python>=4.8.0
+Pillow>=10.0.0
+
+# Numerical / data
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# Configuration
+PyYAML>=6.0.1
+
+# Visualisation
+matplotlib>=3.7.0
+
+# Dashboard
+streamlit>=1.28.0
+streamlit-folium>=0.15.0
+folium>=0.14.0
+
+# Progress + logging
+tqdm>=4.65.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0

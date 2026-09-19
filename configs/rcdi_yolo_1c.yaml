@@ -1,0 +1,71 @@
+# RCDI-YOLO 1-Channel Configuration
+#
+# SOURCE: Architecture based on Zhang, J. and Gao, B. (2025).
+# "RCDI-YOLO: a target-detection method for complex environment
+# side-scan sonar images based on improved YOLOv8."
+# Frontiers in Marine Science 12:1679077.
+#
+# SONARGUARD ADAPTATION: Input changed from 3-channel RGB to
+# 1-channel sonar/acoustic-intensity images [B, 1, H, W].
+# This is a SonarGuard project modification, NOT part of the
+# published RCDI-YOLO paper.
+
+model:
+  name: rcdi_yolo_1c
+  input_channels: 1       # SonarGuard 1C adaptation (paper uses 3)
+  num_classes: 1
+  image_size: 640
+  reg_max: 16             # DFL regression bins
+
+  # Architecture scale (YOLOv8-style multipliers)
+  width_multiple: 0.50    # channel width multiplier
+  depth_multiple: 0.33    # layer depth multiplier
+
+  # Base channel widths (scaled by width_multiple)
+  base_channels: [64, 128, 256, 512, 512]
+
+lanconvnext:
+  # Replace C2f blocks with LANConvNeXtv2 at these positions
+  # SOURCE: Zhang & Gao (2025) placement configuration
+  enabled: true
+  backbone_positions: [1, 2]   # replace C2f #1 and #2 in backbone
+  neck_positions: [1, 2, 4]   # replace C2f #1, #2, #4 in neck
+  expansion: 1.0
+
+dysample:
+  # Replace fixed bilinear upsampling in FPN neck with DySample
+  # SOURCE: Zhang & Gao (2025) neck modification
+  enabled: true
+  scale: 2
+  style: lp    # lp (local propagation) | pl (point-to-learn)
+  groups: 4
+
+implicit_head:
+  # ImplicitHead replaces standard detection head
+  # SOURCE: Zhang & Gao (2025) detection head modification
+  enabled: true
+
+training:
+  # SonarGuard training defaults (separate from paper reference config)
+  epochs: 100
+  batch_size: 16
+  optimizer: AdamW
+  learning_rate: 0.001
+  weight_decay: 0.0005
+  warmup_epochs: 3
+  early_stopping_patience: 30
+
+  augmentation:
+    mosaic:
+      enabled: true
+      probability: 1.0
+      disable_last_epochs: 10
+    horizontal_flip: 0.5
+    # Note: no HSV aug for 1-channel sonar (irrelevant)
+    intensity_jitter: 0.2
+    random_crop: 0.1
+
+  loss:
+    box: 7.5
+    cls: 0.5
+    dfl: 1.5

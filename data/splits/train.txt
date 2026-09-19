@@ -1,0 +1,3 @@
+data/sample_mission/sonar/frame_0000.png
+data/sample_mission/sonar/frame_0001.png
+data/sample_mission/sonar/frame_0002.png

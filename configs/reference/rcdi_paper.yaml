@@ -1,0 +1,61 @@
+# REFERENCE CONFIGURATION — DO NOT USE AS ACTIVE PRODUCTION CONFIG
+#
+# This file records the training settings reported in the source paper:
+#   Zhang, J. and Gao, B. (2025). "RCDI-YOLO: a target-detection
+#   method for complex environment side-scan sonar images based on
+#   improved YOLOv8." Frontiers in Marine Science 12:1679077.
+#
+# Dataset: CESSSD (10,000 images, 640x640)
+# Hardware: RTX 3090
+# Input:    3-channel RGB (NOT adapted for 1-channel sonar)
+#
+# These settings are provided for REFERENCE and REPRODUCIBILITY only.
+# SonarGuard uses configs/config.yaml and configs/rcdi_yolo_1c.yaml.
+
+reference:
+  paper: "RCDI-YOLO: a target-detection method for complex environment side-scan sonar images based on improved YOLOv8"
+  authors: ["Zhang, J.", "Gao, B."]
+  journal: "Frontiers in Marine Science"
+  volume: 12
+  article: 1679077
+  year: 2025
+  doi: "10.3389/fmars.2025.1679077"
+
+# Paper-reported training configuration
+image_size: 640
+optimizer: SGD
+learning_rate: 0.01
+batch_size: 32
+warmup_epochs: 3
+epochs: 100
+early_stopping_patience: 50
+seed: 0
+
+loss:
+  box: 7.5
+  cls: 0.5
+  dfl: 1.5
+
+augmentation:
+  mosaic:
+    probability: 1.0
+    disable_last_epochs: 10
+  horizontal_flip: 0.5
+  hsv:
+    h: 0.015
+    s: 0.7
+    v: 0.4
+
+inference:
+  nms_iou: 0.7
+
+# Paper-reported results (CESSSD dataset, RTX 3090, batch=1, 640x640)
+# These are NOT SonarGuard results. Do not present them as such.
+reported_results:
+  parameters_M: 3.23
+  gflops: 9.3
+  precision: 0.953
+  recall: 0.888
+  map50: 0.957
+  map50_95: 0.608
+  fps_paper_hardware: 163   # RTX 3090, paper conditions only

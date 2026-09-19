@@ -1,0 +1,86 @@
+# SonarGuard Main Configuration
+# This is the active project config - do NOT use configs/reference/rcdi_paper.yaml directly.
+
+project:
+  name: SonarGuard
+  dashboard: NEMO
+  version: "0.1.0-mvp"
+
+runtime:
+  device: auto   # auto | cuda | mps | cpu
+  seed: 42
+  num_workers: 4
+
+input:
+  mode: recorded   # recorded | live
+  image_size: 640
+  channels: 1
+
+preprocessing:
+  grayscale: true
+  normalize: true
+  denoise:
+    enabled: false
+    method: gaussian    # gaussian | median | nlm
+    kernel_size: 3
+  contrast:
+    enabled: false
+    method: clahe       # clahe | histogram_eq
+    clip_limit: 2.0
+    tile_grid_size: [8, 8]
+  image_size: 640
+
+detector:
+  architecture: rcdi_yolov8_1c
+  config: configs/rcdi_yolo_1c.yaml
+  weights: models/rcdi_yolo/weights/rcdi_yolo_1c.pt
+  num_classes: 1
+  confidence_threshold: 0.25
+  nms_iou: 0.70
+  classes:
+    0: target
+
+verifier:
+  architecture: mobilenet_v3_small
+  config: configs/mobilenetv3.yaml
+  weights: models/mobilenetv3/weights/mobilenetv3_verifier.pt
+  crop_size: 128
+  bbox_padding: 0.15
+  confidence_threshold: 0.50
+
+scoring:
+  artificialness:
+    detector_weight: 0.35
+    verifier_weight: 0.45
+    contrast_weight: 0.10
+    geometry_weight: 0.10
+  priority:
+    artificialness_weight: 0.70
+    mission_confidence_weight: 0.20
+    metadata_quality_weight: 0.10
+
+metadata:
+  gps_enabled: true
+  timestamp_enabled: true
+  heading_enabled: true
+
+dashboard:
+  enabled: true
+  host: localhost
+  port: 8501
+
+output:
+  directory: outputs/
+  save_crops: true
+  save_json: true
+  save_csv: true
+
+data:
+  splits_dir: data/splits/
+  hard_negatives_dir: data/hard_negatives/
+  split:
+    strategy: mission_grouped
+    train: 0.70
+    val: 0.15
+    test: 0.15
+    seed: 42

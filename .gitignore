@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Model weights
+*.pt
+*.pth
+*.onnx
+*.trt
+*.engine
+
+# Outputs
+outputs/detections/*
+outputs/crops/*
+outputs/reports/*
+outputs/benchmarks/*
+!outputs/**/.gitkeep
+
+# Datasets
+data/raw/seabedobjects/*
+data/raw/kaggle_sss/*
+data/raw/opensonardatasets/*
+data/raw/dfki_uxo/*
+data/raw/uci_sonar/*
+data/raw/other/*
+!data/raw/**/.gitkeep
+
+# Processed
+data/processed/images/*
+data/processed/crops/*
+!data/processed/**/.gitkeep
+data/hard_negatives/*.png
+data/hard_negatives/**/*.png
+data/hard_negatives/mined/*
+!data/hard_negatives/**/.gitkeep
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
+
+# Logs
+*.log
+logs/
+wandb/
+runs/
+
+# pytest
+.pytest_cache/
+.coverage
+
+# Env
+.env
