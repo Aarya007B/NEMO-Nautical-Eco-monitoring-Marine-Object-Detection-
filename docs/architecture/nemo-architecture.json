@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "NEMO - Validated MVP Architecture",
+    "subtitle": "Side-Scan Sonar to Actionable Mission Intelligence",
+    "output": "nemo-architecture.html",
+    "visual_preset": "blueprint",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1220,
+      460
+    ]
+  },
+  "components": [
+    {
+      "id": "side-scan-sonar",
+      "type": "external",
+      "label": "Sonar",
+      "sublabel": "",
+      "pos": [
+        20,
+        200
+      ],
+      "size": [
+        75,
+        56
+      ]
+    },
+    {
+      "id": "mission-metadata",
+      "type": "external",
+      "label": "Mission",
+      "sublabel": "",
+      "pos": [
+        20,
+        370
+      ],
+      "size": [
+        75,
+        56
+      ]
+    },
+    {
+      "id": "native-1c",
+      "type": "backend",
+      "label": "Native 1C",
+      "sublabel": "",
+      "pos": [
+        218,
+        200
+      ],
+      "size": [
+        75,
+        56
+      ],
+      "tag": "preprocessing"
+    },
+    {
+      "id": "yolo11n",
+      "type": "backend",
+      "label": "YOLO11n-1C",
+      "sublabel": "",
+      "pos": [
+        317,
+        200
+      ],
+      "size": [
+        75,
+        56
+      ],
+      "tag": "detection"
+    },
+    {
+      "id": "crop-extract",
+      "type": "backend",
+      "label": "Crop",
+      "sublabel": "",
+      "pos": [
+        416,
+        200
+      ],
+      "size": [
+        75,
+        56
+      ],
+      "tag": "extraction"
+    },
+    {
+      "id": "mobilenetv3",
+      "type": "backend",
+      "label": "MobileNetV3",
+      "sublabel": "",
+      "pos": [
+        515,
+        200
+      ],
+      "size": [
+        75,
+        56
+      ],
+      "tag": "verification"
+    },
+    {
+      "id": "scoring",
+      "type": "backend",
+      "label": "Scoring",
+      "sublabel": "",
+      "pos": [
+        614,
+        200
+      ],
+      "size": [
+        75,
+        56
+      ],
+      "tag": "scoring"
+    },
+    {
+      "id": "metadata-align",
+      "type": "backend",
+      "label": "Metadata",
+      "sublabel": "",
+      "pos": [
+        713,
+        200
+      ],
+      "size": [
+        75,
+        56
+      ],
+      "tag": "metadata"
+    },
+    {
+      "id": "geolocation",
+      "type": "backend",
+      "label": "Geolocation",
+      "sublabel": "",
+      "pos": [
+        812,
+        200
+      ],
+      "size": [
+        75,
+        56
+      ],
+      "tag": "location"
+    },
+    {
+      "id": "reporting",
+      "type": "backend",
+      "label": "Reporting",
+      "sublabel": "",
+      "pos": [
+        911,
+        200
+      ],
+      "size": [
+        75,
+        56
+      ],
+      "tag": "export"
+    },
+    {
+      "id": "fastapi",
+      "type": "backend",
+      "label": "FastAPI",
+      "sublabel": "",
+      "pos": [
+        1010,
+        200
+      ],
+      "size": [
+        75,
+        56
+      ],
+      "tag": "API"
+    },
+    {
+      "id": "dashboard",
+      "type": "frontend",
+      "label": "Dashboard",
+      "sublabel": "",
+      "pos": [
+        1109,
+        200
+      ],
+      "size": [
+        75,
+        56
+      ],
+      "tag": "UI"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "AI Processing Zone",
+      "wraps": [
+        "native-1c",
+        "yolo11n",
+        "crop-extract",
+        "mobilenetv3"
+      ],
+      "pad": 20
+    },
+    {
+      "kind": "security-group",
+      "label": "Mission Intelligence",
+      "wraps": [
+        "scoring",
+        "metadata-align",
+        "geolocation",
+        "reporting"
+      ],
+      "pad": 16
+    },
+    {
+      "kind": "region",
+      "label": "Application Tier",
+      "wraps": [
+        "fastapi",
+        "dashboard"
+      ],
+      "pad": 18
+    }
+  ],
+  "connections": [
+    {
+      "id": "sonar-to-native1c",
+      "from": "side-scan-sonar",
+      "to": "native-1c",
+      "variant": "emphasis"
+    },
+    {
+      "id": "native1c-to-yolo",
+      "from": "native-1c",
+      "to": "yolo11n",
+      "variant": "emphasis"
+    },
+    {
+      "id": "yolo-to-crop",
+      "from": "yolo11n",
+      "to": "crop-extract",
+      "variant": "emphasis"
+    },
+    {
+      "id": "crop-to-mobilenet",
+      "from": "crop-extract",
+      "to": "mobilenetv3",
+      "variant": "emphasis"
+    },
+    {
+      "id": "mobilenet-to-scoring",
+      "from": "mobilenetv3",
+      "to": "scoring",
+      "variant": "emphasis"
+    },
+    {
+      "id": "scoring-to-metadata",
+      "from": "scoring",
+      "to": "metadata-align",
+      "variant": "emphasis"
+    },
+    {
+      "id": "metadata-to-geolocation",
+      "from": "metadata-align",
+      "to": "geolocation",
+      "variant": "emphasis"
+    },
+    {
+      "id": "geolocation-to-reporting",
+      "from": "geolocation",
+      "to": "reporting",
+      "variant": "emphasis"
+    },
+    {
+      "id": "reporting-to-fastapi",
+      "from": "reporting",
+      "to": "fastapi",
+      "variant": "emphasis"
+    },
+    {
+      "id": "fastapi-to-dashboard",
+      "from": "fastapi",
+      "to": "dashboard",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "INPUT - Side-Scan Sonar",
+      "items": [
+        "Recorded sonar images and mission frames as raw input",
+        "Mission metadata (timestamps, navigation, ping info) when available",
+        "Native 1-channel grayscale preprocessing with letterbox resize to 640x640"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "AI PROCESSING - Two-Stage Detection",
+      "items": [
+        "YOLO11n-1C performs Stage 1 candidate detection with bounding boxes and class prediction",
+        "Candidate Crop Extraction applies configured bbox padding and resizes to 128x128",
+        "MobileNetV3-Small verifies each candidate as accept/reject with secondary verification score"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "MISSION INTELLIGENCE - Scoring to Export",
+      "items": [
+        "Confidence / Priority scoring fuses detector confidence and verifier artificial probability",
+        "Metadata alignment uses timestamp nearest-neighbor matching for GPS coordinates",
+        "Mission metadata is associated with detections via timestamp alignment",
+        "Geolocation maps latitude/longitude; Reporting exports structured JSON and CSV records"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "APPLICATION - FastAPI and Dashboard",
+      "items": [
+        "FastAPI serves as the REST API layer with mission processing, detection, and export endpoints",
+        "NEMO Dashboard provides mission upload, sonar visualization, detection inspection, map view, and report export",
+        "Primary path: SONAR to YOLO11n-1C to MobileNetV3 to Scoring to Geolocation to Reporting to Dashboard"
+      ]
+    }
+  ]
+}
