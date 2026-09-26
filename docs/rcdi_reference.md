@@ -46,7 +46,7 @@ Replaces the standard YOLOv8 detection head. Combines ImplicitA, ImplicitM, and 
 ## SOURCE: Reported Results (CESSSD dataset, RTX 3090)
 
 > **These are the paper's own experimental results.**
-> **They are NOT SonarGuard results.**
+> **They are NOT NEMO results.**
 
 | Metric | Paper Value |
 |--------|------------|
@@ -60,15 +60,15 @@ Replaces the standard YOLOv8 detection head. Combines ImplicitA, ImplicitM, and 
 
 ---
 
-## PROJECT ADAPTATION: SonarGuard Modifications
+## PROJECT ADAPTATION: NEMO Modifications
 
 ### Adaptation 1: 1-Channel Sonar Input
 
 **SOURCE:** Published RCDI-YOLO uses 3-channel RGB input.
 
-**SONARGUARD:** First conv changed to `in_channels=1` for sonar acoustic-intensity.
+**NEMO:** First conv changed to `in_channels=1` for sonar acoustic-intensity.
 
-The resulting model is referred to as **SonarGuard RCDI detector** or **RCDI-YOLO-based 1C sonar detector**.
+The resulting model is referred to as **NEMO RCDI detector** or **RCDI-YOLO-based 1C sonar detector**.
 
 ### Adaptation 2: Single Unified Class
 
@@ -76,7 +76,7 @@ For the MVP, all target objects map to a single `target` class.
 
 ### Adaptation 3: Second-Stage Verifier
 
-SonarGuard adds MobileNetV3-Small as a second-stage verifier. Not part of the published RCDI-YOLO.
+NEMO adds MobileNetV3-Small as a second-stage verifier. Not part of the published RCDI-YOLO.
 
 ### Adaptation 4: Evidence Fusion
 

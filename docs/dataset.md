@@ -1,4 +1,4 @@
-# SonarGuard Dataset Instructions
+# NEMO Dataset Instructions
 
 ## Supported Datasets
 
@@ -9,6 +9,12 @@
 | REMARO OpenSonarDatasets | Sonar images | `opensonardatasets.py` |
 | DFKI-RIC UXO 2024 | Sonar images + annotations | `dfki_uxo.py` |
 | UCI Sonar Mines vs Rocks | Feature vectors (no images) | `uci_sonar.py` |
+
+## Dataset Scope
+
+The validated MVP experiments (T1–T4) were performed on the **KLSG / SeabedObjects** dataset. Other datasets are supported as expansion sources but were not used in the validated MVP training.
+
+Do not claim the model detects every debris category — only those represented in the validated training data (aircraft, shipwreck targets).
 
 ## Setup
 

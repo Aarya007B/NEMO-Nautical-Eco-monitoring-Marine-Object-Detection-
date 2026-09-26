@@ -1,7 +1,7 @@
 """
 models/rcdi_yolo/losses.py
 
-YOLOv8-style combined detection loss for SonarGuard RCDI-YOLO.
+YOLOv8-style combined detection loss for NEMO RCDI-YOLO.
 
 Loss components:
     - IoU loss (box regression)

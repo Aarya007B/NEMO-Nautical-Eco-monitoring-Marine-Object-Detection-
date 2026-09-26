@@ -1,7 +1,7 @@
 """
 models/rcdi_yolo/model.py
 
-RCDIYOLOModel — SonarGuard RCDI-YOLO 1-channel sonar detector.
+RCDIYOLOModel — NEMO RCDI-YOLO 1-channel sonar detector.
 
 SOURCE:
     Architecture based on Zhang, J. and Gao, B. (2025).
@@ -9,7 +9,7 @@ SOURCE:
     side-scan sonar images based on improved YOLOv8."
     Frontiers in Marine Science 12:1679077.
 
-SONARGUARD ADAPTATIONS:
+NEMO ADAPTATIONS:
     - Input: 1-channel sonar acoustic-intensity images [B, 1, H, W]
       (paper uses 3-channel RGB)
     - Class: single unified 'target' class for MVP
@@ -116,14 +116,14 @@ def nms(
 
 class RCDIYOLOModel(nn.Module):
     """
-    SonarGuard RCDI-YOLO detector.
+    NEMO RCDI-YOLO detector.
 
     Assembles backbone + neck + head into a complete detector.
     The CandidateDetector wrapper in inference/detector.py is the
     preferred external interface; this class handles the raw network.
 
     SOURCE: Zhang & Gao (2025) RCDI-YOLO; YOLOv8 base.
-    SONARGUARD: 1-channel input, single 'target' class.
+    NEMO: 1-channel input, single 'target' class.
 
     Args:
         in_channels (int):             Input channels (1 for sonar).

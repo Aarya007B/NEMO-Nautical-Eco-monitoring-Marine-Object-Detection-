@@ -1,6 +1,6 @@
-# NEMO Main Configuration
-# Validated MVP default — YOLO11n-1C + MobileNetV3-Small
-# For RCDI-YOLO research, use configs/research_rcdi.yaml
+# NEMO MVP Configuration
+# This is the validated default configuration for the NEMO submission.
+# Based on T1-T4 experiment results.
 
 project:
   name: NEMO
@@ -17,23 +17,22 @@ input:
   channels: 1
 
 # MVP preprocessing: raw native 1-channel input.
-# Based on T1/T3 ablation experiments, native input outperformed
-# normalization and contrast-enhancement variants.
+# The preprocessing framework supports multiple sonar enhancement strategies.
+# Based on the completed T1/T3 ablation experiments, the validated MVP uses
+# native 1-channel sonar input with standard resizing/letterboxing.
+# Normalization and contrast-enhancement variants remain available as
+# research extensions.
 preprocessing:
   grayscale: true
   normalize: false    # raw native input (T3 validated)
   denoise:
     enabled: false
-    method: gaussian    # gaussian | median | nlm
-    kernel_size: 3
   contrast:
     enabled: false
-    method: clahe       # clahe | histogram_eq
-    clip_limit: 2.0
-    tile_grid_size: [8, 8]
   image_size: 640
 
 # Validated MVP detector: YOLO11n-1C
+# Selected based on T1 (input representation) and T2 (model scale) experiments.
 detector:
   architecture: yolo11n_1c
   weights: models/yolo11/weights/yolo11n_1c.pt
@@ -46,10 +45,11 @@ detector:
     0: target
 
 # Validated MVP verifier: MobileNetV3-Small
+# T4 experiment demonstrated ~15.79% FP reduction with retained recall.
 verifier:
   architecture: mobilenet_v3_small
-  config: configs/mobilenetv3.yaml
   weights: models/mobilenetv3/weights/mobilenetv3_verifier.pt
+  enabled: true
   crop_size: 128
   bbox_padding: 0.15
   confidence_threshold: 0.50

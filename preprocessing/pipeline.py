@@ -16,7 +16,7 @@ Pipeline:
           ↓
     Letterbox resize + padding
           ↓
-    Tensor [1, H, W]  (SonarGuard 1-channel format)
+    Tensor [1, H, W]  (NEMO 1-channel format)
 """
 import logging
 from pathlib import Path
@@ -38,8 +38,14 @@ class SonarPreprocessor:
     """
     Configurable sonar image preprocessing pipeline.
 
-    Converts raw sonar images (any supported format) into a normalized
-    1-channel [1, H, W] float32 PyTorch tensor ready for RCDI-YOLO.
+    Converts raw sonar images (any supported format) into a
+    1-channel [1, H, W] float32 PyTorch tensor ready for the
+    YOLO11n-1C detector (validated MVP).
+
+    The validated MVP default uses raw native input (normalize=false).
+    Normalization, denoising, and contrast enhancement are available
+    as configurable options but were not selected based on T1/T3
+    ablation experiments.
 
     The raw image is NEVER modified on disk.
 

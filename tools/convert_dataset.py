@@ -1,5 +1,5 @@
 """
-tools/convert_dataset.py — Convert a raw dataset to SonarGuard canonical format.
+tools/convert_dataset.py — Convert a raw dataset to NEMO canonical format.
 
 Usage:
     python tools/convert_dataset.py --dataset seabedobjects --root data/raw/seabedobjects

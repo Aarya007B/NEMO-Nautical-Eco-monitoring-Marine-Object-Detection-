@@ -1,5 +1,5 @@
 # MobileNetV3-Small Verifier Configuration
-# Second-stage candidate verifier for SonarGuard.
+# Second-stage candidate verifier for NEMO.
 
 model:
   name: mobilenet_v3_small

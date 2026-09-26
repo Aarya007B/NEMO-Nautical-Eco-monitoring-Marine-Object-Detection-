@@ -36,7 +36,7 @@ def train():
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     )
     logger.info("=" * 60)
-    logger.info("SonarGuard MobileNetV3 Verifier Trainer")
+    logger.info("NEMO MobileNetV3 Verifier Trainer")
     logger.info("=" * 60)
 
     with open(args.config) as f:

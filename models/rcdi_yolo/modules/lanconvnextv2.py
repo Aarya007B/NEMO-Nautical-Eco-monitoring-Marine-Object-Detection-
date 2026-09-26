@@ -20,10 +20,10 @@ PLACEMENT (from paper):
     Backbone: replaces C2f at positions 1, 2
     Neck:     replaces C2f at positions 1, 2, 4
 
-SONARGUARD ADAPTATION:
+NEMO ADAPTATION:
     This module operates on feature maps and is channel-agnostic after
     the backbone stem. It is compatible with the 1-channel sonar input
-    adaptation used by SonarGuard (the first conv layer handles 1-channel;
+    adaptation used by NEMO (the first conv layer handles 1-channel;
     this module sees intermediate feature maps at any channel width).
 """
 import logging
@@ -141,7 +141,7 @@ class LANConvNeXtv2(nn.Module):
         Residual shortcut (with projection if channels differ)
 
     SOURCE: Zhang, J. and Gao, B. (2025), Frontiers in Marine Science 12:1679077.
-    SONARGUARD: Compatible with 1-channel sonar adaptation.
+    NEMO: Compatible with 1-channel sonar adaptation.
 
     Args:
         in_channels (int):  Input channel count.

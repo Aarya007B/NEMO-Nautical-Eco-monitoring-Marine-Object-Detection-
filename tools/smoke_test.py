@@ -1,7 +1,8 @@
 """
-tools/smoke_test.py — SonarGuard Phase 1-3 smoke test.
+tools/smoke_test.py — NEMO MVP smoke test.
 
-Runs minimum checks to verify scaffold, preprocessing, and RCDI-YOLO forward pass.
+Runs minimum checks to verify scaffold, preprocessing, YOLO11n-1C detector,
+MobileNetV3 verifier, and RCDI-YOLO modules.
 
 Does NOT require:
     - Trained model weights
@@ -40,7 +41,7 @@ def check(name, fn):
 
 
 print("\n" + "=" * 60)
-print(" SonarGuard / NEMO — Smoke Test")
+print(" NEMO — Smoke Test")
 print("=" * 60)
 
 # ---- [1] Environment ----
@@ -136,8 +137,52 @@ def _pp_rgb():
     assert tensor.shape == (1, 640, 640)
 check("SonarPreprocessor: RGB -> single-channel", _pp_rgb)
 
-# ---- [5] RCDI Modules ----
-print("\n[5] RCDI-YOLO Custom Modules")
+# ---- [5] MVP Defaults ----
+print("\n[5] MVP Defaults")
+
+def _mvp_detector():
+    import yaml
+    with open("configs/config.yaml") as f:
+        cfg = yaml.safe_load(f)
+    assert cfg["detector"]["architecture"] == "yolo11n_1c", (
+        f"Default detector is {cfg['detector']['architecture']}, expected yolo11n_1c"
+    )
+check("Default detector is YOLO11n-1C", _mvp_detector)
+
+def _mvp_no_normalize():
+    import yaml
+    with open("configs/config.yaml") as f:
+        cfg = yaml.safe_load(f)
+    assert cfg["preprocessing"]["normalize"] is False, "MVP default must be normalize=false"
+check("Default preprocessing: no normalization", _mvp_no_normalize)
+
+def _yolo11n_construct():
+    from models.yolo11.model import YOLO11nDetector
+    model = YOLO11nDetector(weights_path="nonexistent.pt", demo_mode=True)
+    assert model.demo_mode is True
+check("YOLO11nDetector constructs (demo mode)", _yolo11n_construct)
+
+def _yolo11n_predict():
+    import torch
+    from models.yolo11.model import YOLO11nDetector
+    model = YOLO11nDetector(weights_path="nonexistent.pt", demo_mode=True)
+    dets = model.predict(torch.randn(1, 1, 640, 640), frame_id="smoke")
+    assert isinstance(dets, list)
+check("YOLO11nDetector predict() in demo mode", _yolo11n_predict)
+
+def _detector_factory():
+    import torch
+    from inference.detector import _build_detector_model
+    from models.yolo11.model import YOLO11nDetector
+    model = _build_detector_model(
+        {"architecture": "yolo11n_1c", "demo_mode": True},
+        torch.device("cpu"),
+    )
+    assert isinstance(model, YOLO11nDetector)
+check("Detector factory selects YOLO11n-1C", _detector_factory)
+
+# ---- [5a] RCDI Modules (Research) ----
+print("\n[5a] RCDI-YOLO Custom Modules (Research)")
 
 def _lanconv():
     import torch

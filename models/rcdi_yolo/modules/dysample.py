@@ -18,7 +18,7 @@ DESIGN PURPOSE (from paper):
     feature characteristics. Better preserves target edges and boundaries
     in noisy sonar imagery.
 
-SONARGUARD:
+NEMO:
     Used in the RCDI neck to upsample feature maps in the FPN top-down path.
     Module is channel-agnostic and works with 1-channel sonar adaptation.
 """

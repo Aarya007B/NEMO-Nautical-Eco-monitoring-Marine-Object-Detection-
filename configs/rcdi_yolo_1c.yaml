@@ -5,14 +5,14 @@
 # side-scan sonar images based on improved YOLOv8."
 # Frontiers in Marine Science 12:1679077.
 #
-# SONARGUARD ADAPTATION: Input changed from 3-channel RGB to
+# NEMO ADAPTATION: Input changed from 3-channel RGB to
 # 1-channel sonar/acoustic-intensity images [B, 1, H, W].
-# This is a SonarGuard project modification, NOT part of the
+# This is a NEMO project modification, NOT part of the
 # published RCDI-YOLO paper.
 
 model:
   name: rcdi_yolo_1c
-  input_channels: 1       # SonarGuard 1C adaptation (paper uses 3)
+  input_channels: 1       # NEMO 1C adaptation (paper uses 3)
   num_classes: 1
   image_size: 640
   reg_max: 16             # DFL regression bins
@@ -46,7 +46,7 @@ implicit_head:
   enabled: true
 
 training:
-  # SonarGuard training defaults (separate from paper reference config)
+  # NEMO training defaults (separate from paper reference config)
   epochs: 100
   batch_size: 16
   optimizer: AdamW

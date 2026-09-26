@@ -1,8 +1,10 @@
 """
-main.py — SonarGuard / NEMO entry point.
+main.py — NEMO entry point.
 
 Usage:
     python main.py --mode recorded --config configs/config.yaml --mission path/to/mission/
+    python main.py --mode api --config configs/config.yaml
+    streamlit run dashboard/app.py  (legacy, for frontend team reference)
 """
 import argparse
 import logging
@@ -16,7 +18,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
-logger = logging.getLogger("sonarguard")
+logger = logging.getLogger("nemo")
 
 
 def load_config(config_path: str) -> dict:
@@ -32,27 +34,23 @@ def run_recorded(config: dict, mission_dir: str) -> None:
 
     logger.info("Mode: recorded | Mission: %s", mission_dir)
 
-    # Discover mission frames
     source = RecordedMissionSource(mission_dir)
 
     if len(source) == 0:
         logger.warning("No sonar frames found in %s", mission_dir)
         return
 
-    # Build pipeline with optional navigation data
     pipeline = MissionPipeline.from_config(
         config,
         navigation_file=source.navigation_file,
     )
 
-    # Process all frames
     def progress(idx, total):
         if idx % 10 == 0 or idx == total:
             logger.info("Progress: %d/%d frames", idx, total)
 
     all_results = pipeline.process_mission(source, progress_callback=progress)
 
-    # Generate reports
     reporter = ReportGenerator(config.get("output", {}))
     outputs = reporter.generate(all_results, mission_id=source.mission_id)
 
@@ -61,11 +59,22 @@ def run_recorded(config: dict, mission_dir: str) -> None:
         logger.info("  %s: %s", fmt, path)
 
 
+def run_api(config: dict) -> None:
+    """Start the NEMO REST API server."""
+    from dashboard.app import app
+    import uvicorn
+
+    host = config.get("dashboard", {}).get("host", "0.0.0.0")
+    port = config.get("dashboard", {}).get("port", 8000)
+    logger.info("Starting NEMO REST API at http://%s:%d", host, port)
+    uvicorn.run(app, host=host, port=port)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="SonarGuard — AI-powered side-scan sonar debris detection"
+        description="NEMO — AI-powered side-scan sonar debris detection"
     )
-    parser.add_argument("--mode", choices=["recorded", "live"], default="recorded")
+    parser.add_argument("--mode", choices=["recorded", "api"], default="recorded")
     parser.add_argument("--config", default="configs/config.yaml")
     parser.add_argument("--mission", default=None, help="Path to mission directory")
     args = parser.parse_args()
@@ -81,9 +90,8 @@ def main() -> None:
             logger.error("--mission path required for recorded mode")
             sys.exit(1)
         run_recorded(config, args.mission)
-    elif args.mode == "live":
-        logger.error("Live mode is not yet implemented (see mission/live.py).")
-        sys.exit(1)
+    elif args.mode == "api":
+        run_api(config)
 
 
 if __name__ == "__main__":

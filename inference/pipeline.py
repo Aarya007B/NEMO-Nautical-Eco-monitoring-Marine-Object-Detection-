@@ -3,7 +3,7 @@ inference/pipeline.py — Full two-stage mission pipeline.
 
 Orchestrates:
     1. Preprocessing
-    2. Stage-1 RCDI-YOLO detection
+    2. Stage-1 YOLO11n-1C detection (validated MVP)
     3. Crop extraction
     4. Stage-2 MobileNetV3 verification
     5. Evidence fusion

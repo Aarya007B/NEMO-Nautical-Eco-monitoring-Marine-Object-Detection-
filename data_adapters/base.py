@@ -1,7 +1,7 @@
 """
 data_adapters/base.py
 
-Base class for all SonarGuard dataset adapters.
+Base class for all NEMO dataset adapters.
 Every adapter converts its source dataset into DatasetRecord objects.
 """
 import logging
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class BaseDatasetAdapter(ABC):
     """
-    Abstract base class for SonarGuard dataset adapters.
+    Abstract base class for NEMO dataset adapters.
 
     Args:
         root (str): Path to the raw dataset root directory.

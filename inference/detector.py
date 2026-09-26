@@ -1,8 +1,12 @@
 """
 inference/detector.py — CandidateDetector wrapper.
 
-Wraps the RCDI-YOLO model with preprocessing for use in the
-inference pipeline.
+Supports multiple detector backends:
+  - yolo11n_1c (default MVP) — YOLO11n-1C validated detector
+  - rcdi_yolov8_1c           — RCDI-YOLO experimental detector
+
+The default production detector is YOLO11n-1C, selected based on
+T1/T2/T3 ablation experiments. See docs/EXPERIMENT_RESULTS.md.
 """
 import logging
 from typing import Dict, List, Optional, Tuple
@@ -11,18 +15,48 @@ import numpy as np
 import torch
 
 from inference.types import Detection, BoundingBox
-from models.rcdi_yolo.model import RCDIYOLOModel
 from preprocessing.pipeline import SonarPreprocessor
 
 logger = logging.getLogger(__name__)
+
+
+def _build_detector_model(detector_config: Dict, device: torch.device):
+    """
+    Factory function to build the appropriate detector model.
+
+    Args:
+        detector_config: Detector config dict from config.yaml.
+        device: Target device.
+
+    Returns:
+        A detector model instance with a predict() method.
+    """
+    architecture = detector_config.get("architecture", "yolo11n_1c")
+
+    if architecture == "rcdi_yolov8_1c":
+        # RCDI-YOLO: experimental/research detector
+        from models.rcdi_yolo.model import RCDIYOLOModel
+        model_config = detector_config.get("config", "configs/rcdi_yolo_1c.yaml")
+        model = RCDIYOLOModel.from_config(model_config).to(device)
+        logger.info("CandidateDetector: using RCDI-YOLO (experimental)")
+    else:
+        # Default: YOLO11n-1C validated MVP detector
+        from models.yolo11.model import YOLO11nDetector
+        model = YOLO11nDetector.from_config(detector_config).to(device)
+        logger.info("CandidateDetector: using YOLO11n-1C (validated MVP)")
+
+    return model
 
 
 class CandidateDetector:
     """
     Stage-1 candidate detector.
 
-    Wraps SonarPreprocessor + RCDI-YOLO model to detect candidates
+    Wraps SonarPreprocessor + detector model to detect candidates
     from raw sonar images.
+
+    The default detector is YOLO11n-1C (validated MVP).
+    RCDI-YOLO is available as an experimental alternative via configuration.
 
     Args:
         detector_config: Detector config dict from config.yaml.
@@ -39,9 +73,8 @@ class CandidateDetector:
         self.device = self._resolve_device(device)
         self.preprocessor = SonarPreprocessor(preprocessing_config)
 
-        # Build or load model
-        model_config = detector_config.get("config", "configs/rcdi_yolo_1c.yaml")
-        self.model = RCDIYOLOModel.from_config(model_config).to(self.device)
+        # Build detector based on configuration
+        self.model = _build_detector_model(detector_config, self.device)
         self.model.eval()
 
         # Attempt to load weights
@@ -55,6 +88,12 @@ class CandidateDetector:
                     "Detector weights not found at %s. "
                     "Running with random weights (smoke test mode).",
                     weights_path,
+                )
+            except Exception as e:
+                logger.warning(
+                    "Could not load detector weights from %s: %s. "
+                    "Running in smoke test mode.",
+                    weights_path, e,
                 )
 
         self.conf_threshold = detector_config.get("confidence_threshold", 0.25)

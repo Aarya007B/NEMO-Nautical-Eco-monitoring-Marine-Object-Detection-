@@ -12,7 +12,7 @@ PURPOSE:
         detector_confidence
         verifier_artificial_probability
 
-SONARGUARD ADAPTATION:
+NEMO ADAPTATION:
     Input: single-channel sonar crop [B, 1, 128, 128]
     (torchvision MobileNetV3 normally expects 3-channel RGB)
 
@@ -73,7 +73,7 @@ class MobileNetV3Verifier(nn.Module):
             ) from e
 
         # Adapt first convolution for 1-channel sonar input
-        # SOURCE: SonarGuard adaptation (NOT part of original MobileNetV3)
+        # SOURCE: NEMO adaptation (NOT part of original MobileNetV3)
         if in_channels != 3:
             orig_conv = backbone.features[0][0]
             new_conv = nn.Conv2d(

@@ -1,5 +1,5 @@
 """
-inference — SonarGuard two-stage detection pipeline.
+inference — NEMO two-stage detection pipeline.
 
 Exports:
     Types:      BoundingBox, Detection, VerificationResult, etc.

@@ -1,14 +1,14 @@
 """
 models/rcdi_yolo/backbone.py
 
-SonarGuard RCDI-YOLO Backbone (YOLOv8-style, 1-channel input).
+NEMO RCDI-YOLO Backbone (YOLOv8-style, 1-channel input).
 
 SOURCE:
     Based on YOLOv8 backbone architecture.
     RCDI modifications from Zhang, J. and Gao, B. (2025).
     Frontiers in Marine Science 12:1679077.
 
-SONARGUARD ADAPTATIONS:
+NEMO ADAPTATIONS:
     1. First convolution: in_channels=1 (sonar acoustic-intensity, not RGB).
     2. LANConvNeXtv2 replaces C2f at backbone positions 1 and 2 (paper config).
     3. Remaining C2f blocks preserved as per YOLOv8 design.
@@ -99,7 +99,7 @@ class RCDIBackbone(nn.Module):
     Depth (n bottlenecks in C2f) is scaled by depth_multiple.
 
     SOURCE: YOLOv8 backbone; Zhang & Gao (2025) modifications.
-    SONARGUARD: First conv changed to in_channels=1.
+    NEMO: First conv changed to in_channels=1.
 
     Args:
         in_channels (int):    Input channels (1 for sonar).
@@ -136,7 +136,7 @@ class RCDIBackbone(nn.Module):
         c4 = ch(4)  # P5
 
         # ----- Stem -----
-        # SONARGUARD: in_channels=1 (not 3)
+        # NEMO: in_channels=1 (not 3)
         self.stem = ConvBnSilu(in_channels, c0, k=3, s=2)   # /2 -> 320x320
 
         # ----- P2 stage -----

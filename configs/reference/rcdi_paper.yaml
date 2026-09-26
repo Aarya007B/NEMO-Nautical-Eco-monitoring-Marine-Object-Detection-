@@ -10,7 +10,7 @@
 # Input:    3-channel RGB (NOT adapted for 1-channel sonar)
 #
 # These settings are provided for REFERENCE and REPRODUCIBILITY only.
-# SonarGuard uses configs/config.yaml and configs/rcdi_yolo_1c.yaml.
+# NEMO uses configs/config.yaml and configs/rcdi_yolo_1c.yaml.
 
 reference:
   paper: "RCDI-YOLO: a target-detection method for complex environment side-scan sonar images based on improved YOLOv8"
@@ -50,7 +50,7 @@ inference:
   nms_iou: 0.7
 
 # Paper-reported results (CESSSD dataset, RTX 3090, batch=1, 640x640)
-# These are NOT SonarGuard results. Do not present them as such.
+# These are NOT NEMO results. Do not present them as such.
 reported_results:
   parameters_M: 3.23
   gflops: 9.3

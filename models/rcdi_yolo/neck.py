@@ -1,7 +1,7 @@
 """
 models/rcdi_yolo/neck.py
 
-SonarGuard RCDI-YOLO Neck (FPN + PAN with DySample + LANConvNeXtv2).
+NEMO RCDI-YOLO Neck (FPN + PAN with DySample + LANConvNeXtv2).
 
 SOURCE:
     Based on YOLOv8 FPN+PAN neck.
@@ -46,7 +46,7 @@ class RCDINeck(nn.Module):
     three multi-scale feature maps for the detection head.
 
     SOURCE: YOLOv8 neck; Zhang & Gao (2025) modifications.
-    SONARGUARD: Channel-agnostic after backbone stem adaptation.
+    NEMO: Channel-agnostic after backbone stem adaptation.
 
     Args:
         backbone_channels (tuple): (c_p3, c_p4, c_p5) from backbone.

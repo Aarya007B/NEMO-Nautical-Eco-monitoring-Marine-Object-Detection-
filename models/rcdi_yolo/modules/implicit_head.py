@@ -144,7 +144,7 @@ class ImplicitHead(nn.Module):
     The DFL module decodes raw box distributions into distances.
 
     SOURCE: Zhang & Gao (2025), ImplicitHead section.
-    SONARGUARD: num_classes defaults to 1 (single 'target' class).
+    NEMO: num_classes defaults to 1 (single 'target' class).
 
     Args:
         in_channels (List[int]): Feature channels for each detection scale.

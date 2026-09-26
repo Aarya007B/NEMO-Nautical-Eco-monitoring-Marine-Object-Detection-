@@ -1,5 +1,5 @@
 """
-tools/benchmark.py — SonarGuard per-stage latency benchmark.
+tools/benchmark.py — NEMO per-stage latency benchmark.
 
 Measures preprocessing, detector, crop extraction, verifier, and
 fusion latency independently.
@@ -79,7 +79,7 @@ def benchmark(config_path: str, iterations: int = 50):
         timings["total"].append(time.perf_counter() - t_total_start)
 
     print("\n" + "=" * 55)
-    print(" SonarGuard Latency Benchmark")
+    print(" NEMO Latency Benchmark")
     print(f" Config:     {config_path}")
     print(f" Iterations: {iterations}")
     print(f" Device:     CPU (benchmark uses CPU)")
@@ -95,13 +95,13 @@ def benchmark(config_path: str, iterations: int = 50):
               f"FPS={fps:.1f}")
 
     print("\n" + "=" * 55)
-    print("  NOTE: Paper reports ~163 FPS on RTX 3090.")
+    print("  Reference: YOLO11n-1C ~64 FPS, +MobileNetV3 ~37 FPS on T4.")
     print("  These are YOUR device-specific measurements.")
     print("=" * 55 + "\n")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="SonarGuard Benchmark")
+    parser = argparse.ArgumentParser(description="NEMO Benchmark")
     parser.add_argument("--config", default="configs/config.yaml")
     parser.add_argument("--iterations", type=int, default=50)
     args = parser.parse_args()

@@ -1,5 +1,5 @@
 """
-inference/types.py — Shared typed data structures for SonarGuard.
+inference/types.py — Shared typed data structures for NEMO.
 
 All major subsystems communicate through these typed dataclasses.
 Avoid passing raw dicts between modules; use these types instead.
@@ -80,7 +80,7 @@ class BoundingBox:
 @dataclass
 class Detection:
     """
-    Raw output from the RCDI-YOLO Stage-1 candidate detector.
+    Raw output from the Stage-1 candidate detector (YOLO11n-1C in validated MVP).
 
     Stores detector-level evidence independently from the verifier output
     so scores remain traceable (PRD §13).
@@ -166,7 +166,7 @@ class DetectionResult:
     detection_id: str
     bbox: BoundingBox
 
-    # Stage 1 — RCDI-YOLO detector
+    # Stage 1 — YOLO11n-1C detector (validated MVP)
     detector_confidence: float
     detector_class: str
 

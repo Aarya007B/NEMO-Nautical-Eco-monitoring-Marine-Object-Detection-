@@ -1,0 +1,74 @@
+# RCDI-YOLO Research Configuration
+#
+# This configuration is for EXPERIMENTAL / RESEARCH use only.
+# It is NOT the default MVP configuration.
+#
+# RCDI-YOLO was considered as a research candidate for the NEMO detector
+# but was not included in the validated MVP because a controlled
+# apples-to-apples trained benchmark was not completed.
+#
+# For the validated MVP, use: configs/mvp.yaml or configs/config.yaml
+
+project:
+  name: NEMO
+  version: "0.1.0-mvp"
+  mode: research
+
+runtime:
+  device: auto
+  seed: 42
+  num_workers: 4
+
+input:
+  mode: recorded
+  image_size: 640
+  channels: 1
+
+preprocessing:
+  grayscale: true
+  normalize: true
+  denoise:
+    enabled: false
+  contrast:
+    enabled: false
+  image_size: 640
+
+detector:
+  architecture: rcdi_yolov8_1c
+  config: configs/rcdi_yolo_1c.yaml
+  weights: models/rcdi_yolo/weights/rcdi_yolo_1c.pt
+  num_classes: 1
+  confidence_threshold: 0.25
+  nms_iou: 0.70
+  classes:
+    0: target
+
+verifier:
+  architecture: mobilenet_v3_small
+  weights: models/mobilenetv3/weights/mobilenetv3_verifier.pt
+  enabled: true
+  crop_size: 128
+  bbox_padding: 0.15
+  confidence_threshold: 0.50
+
+scoring:
+  artificialness:
+    detector_weight: 0.35
+    verifier_weight: 0.45
+    contrast_weight: 0.10
+    geometry_weight: 0.10
+  priority:
+    artificialness_weight: 0.70
+    mission_confidence_weight: 0.20
+    metadata_quality_weight: 0.10
+
+metadata:
+  gps_enabled: true
+  timestamp_enabled: true
+  heading_enabled: true
+
+output:
+  directory: outputs/
+  save_crops: true
+  save_json: true
+  save_csv: true
