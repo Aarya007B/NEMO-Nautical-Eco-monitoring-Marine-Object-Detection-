@@ -11,10 +11,12 @@ from typing import Iterator, List, Optional
 
 from inference.types import MissionFrame
 from mission.source import MissionSource
+from mission.xtf_conversion import convert_xtf_to_png
+
 
 logger = logging.getLogger(__name__)
 
-IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp"}
+IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp",".xtf"}
 
 
 class RecordedMissionSource(MissionSource):
@@ -41,7 +43,7 @@ class RecordedMissionSource(MissionSource):
         mission_dir: str,
         sonar_subdir: str = "sonar",
     ):
-        self._mission_dir = Path(mission_dir)
+        self._mission_dir = Path(mission_dir).expanduser().resolve()
         self._sonar_dir = self._mission_dir / sonar_subdir
         self._mission_meta = self._load_mission_meta()
         self._frames = self._discover_frames()
@@ -60,6 +62,13 @@ class RecordedMissionSource(MissionSource):
 
     def __iter__(self) -> Iterator[MissionFrame]:
         for idx, path in enumerate(self._frames):
+            if path.suffix.lower() == ".xtf":
+                image_path = convert_xtf_to_png(
+                    xtf_path=path,
+                    output_dir=converted_dir,
+                )
+            else:
+                image_path = path
             yield MissionFrame(
                 frame_id=path.stem,
                 image_path=str(path),
