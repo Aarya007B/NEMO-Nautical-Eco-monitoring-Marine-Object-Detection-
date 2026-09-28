@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEMO · How it works</title>
+  <meta name="description" content="How NEMO detects marine debris in side-scan sonar: YOLO11n proposes candidates, MobileNetV3 verifies them, every contact ships as reviewable evidence.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Spectral:ital,wght@0,300;0,400;1,300&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --abyss-0: #04090F;
+      --abyss-1: #081220;
+      --abyss-2: #0C1A2C;
+      --abyss-3: #12263C;
+      --ink-line: rgba(120, 200, 190, 0.14);
+      --ink-line-strong: rgba(120, 200, 190, 0.32);
+      --phosphor: #3CF5C8;
+      --phosphor-deep: #0E9F7E;
+      --phosphor-wash: rgba(60, 245, 200, 0.09);
+      --foam: #EAF6F1;
+      --murk: #9DB8B2;
+      --silt: #647E7A;
+      --amber: #FFB454;
+      --radius: 8px;
+      --radius-lg: 14px;
+      --font-display: 'Spectral', Georgia, serif;
+      --font-plate: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--abyss-0);
+      color: var(--foam);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      font-size: 15px;
+      line-height: 1.75;
+    }
+    ::selection { background: var(--phosphor); color: #04241B; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--phosphor); outline-offset: 3px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: var(--abyss-0); }
+    ::-webkit-scrollbar-thumb { background: var(--abyss-3); border-radius: 6px; border: 2px solid var(--abyss-0); }
+
+    /* NAV */
+    .site-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: transparent;
+      transition: background 180ms var(--ease-out);
+    }
+    .site-nav.scrolled {
+      background: rgba(8, 18, 32, 0.92);
+      border-bottom: 1px solid var(--ink-line);
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-brand-icon {
+      width: 30px; height: 30px;
+      background: var(--phosphor-wash);
+      border: 1px solid var(--ink-line-strong);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-plate);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--phosphor);
+    }
+    .nav-brand-text {
+      font-family: var(--font-plate);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      color: var(--foam);
+    }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a {
+      text-decoration: none;
+      font-family: var(--font-plate);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--murk);
+      transition: color 180ms var(--ease-out);
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--phosphor); }
+    .nav-cta {
+      padding: 10px 22px;
+      background: var(--phosphor);
+      color: #04241B;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 180ms var(--ease-out), transform 180ms var(--ease-out);
+      box-shadow: 0 2px 0 var(--phosphor-deep);
+      border: none;
+    }
+    .nav-cta:hover { background: #6FF7D4; }
+    .nav-cta:active { transform: translateY(1px); }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 80px 32px 100px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 60% 15%, rgba(60, 245, 200, 0.07) 0%, transparent 60%),
+        linear-gradient(180deg, rgba(8, 18, 32, 0.55) 0%, rgba(4, 9, 15, 0.35) 40%, var(--abyss-0) 100%);
+    }
+    .hero-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.42;
+    }
+    .hero-scan {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(180deg, transparent 0px, transparent 3px, rgba(4, 9, 15, 0.12) 3px, rgba(4, 9, 15, 0.12) 4px);
+      pointer-events: none;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(4, 9, 15, 0.25) 0%, transparent 40%, rgba(4, 9, 15, 0.72) 70%, var(--abyss-0) 100%);
+    }
+    .hero-content { position: relative; z-index: 2; max-width: 780px; }
+    .hero-kicker {
+      font-family: var(--font-plate);
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--phosphor);
+      margin-bottom: 18px;
+    }
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: clamp(2.6rem, 6vw, 4.6rem);
+      font-weight: 300;
+      line-height: 1.06;
+      color: var(--foam);
+      letter-spacing: -0.01em;
+      text-wrap: balance;
+      margin-bottom: 20px;
+    }
+    .hero-subtitle {
+      font-size: clamp(15px, 1.8vw, 17px);
+      line-height: 1.75;
+      color: var(--murk);
+      max-width: 58ch;
+      margin-bottom: 32px;
+    }
+    .hero-cta-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: var(--phosphor);
+      color: #04241B;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 2px 0 var(--phosphor-deep), 0 12px 28px rgba(0, 0, 0, 0.5);
+      transition: background 180ms var(--ease-out), transform 180ms var(--ease-out);
+    }
+    .btn-primary:hover { background: #6FF7D4; }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 0;
+      background: none;
+      border: none;
+      color: var(--murk);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      border-bottom: 1px solid var(--ink-line-strong);
+      transition: color 180ms var(--ease-out), border-color 180ms var(--ease-out);
+    }
+    .btn-ghost:hover { color: var(--phosphor); border-color: var(--phosphor); }
+    .btn-ghost:active { transform: scale(0.98); }
+
+    /* SECTIONS */
+    section { position: relative; padding: 88px 32px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-kicker {
+      font-family: var(--font-plate);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--phosphor-deep);
+      margin-bottom: 14px;
+    }
+    .section-heading {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: clamp(1.9rem, 3.6vw, 2.8rem);
+      line-height: 1.15;
+      color: var(--foam);
+      text-wrap: balance;
+    }
+
+    /* PROBLEM */
+    .section-problem { background: var(--abyss-0); }
+    .problem-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+    .problem-copy p { font-size: 16px; line-height: 1.85; color: var(--murk); margin-bottom: 16px; max-width: 62ch; }
+    .problem-visual {
+      position: relative;
+      height: 380px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--ink-line);
+      box-shadow: inset 0 1px 0 rgba(180, 255, 240, 0.06), 0 14px 30px rgba(0, 0, 0, 0.35);
+      background: var(--abyss-2);
+    }
+    .problem-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .problem-caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: 0.04em;
+      color: var(--murk);
+      background: rgba(4, 9, 15, 0.82);
+      border-top: 1px solid var(--ink-line);
+      padding: 10px 16px;
+    }
+
+    /* WORKFLOW */
+    .section-workflow { background: var(--abyss-1); border-top: 1px solid var(--ink-line); }
+    .workflow-steps { display: flex; flex-direction: column; gap: 0; list-style: none; position: relative; }
+    .workflow-steps::before {
+      content: '';
+      position: absolute;
+      left: 21px; top: 26px; bottom: 26px;
+      width: 1px;
+      background: var(--ink-line-strong);
+    }
+    .workflow-step {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 24px;
+      padding: 26px 0;
+      border-bottom: 1px solid var(--ink-line);
+      position: relative;
+    }
+    .workflow-step:last-child { border-bottom: none; }
+    .step-node {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--abyss-0);
+      border: 1px solid var(--ink-line-strong);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 12px; font-weight: 600;
+      color: var(--phosphor);
+      position: relative; z-index: 1;
+    }
+    .step-label {
+      font-family: var(--font-plate);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--silt);
+      margin-bottom: 6px;
+    }
+    .step-title { font-family: var(--font-display); font-weight: 400; font-size: 21px; color: var(--foam); margin-bottom: 8px; line-height: 1.3; }
+    .step-desc { font-size: 14.5px; line-height: 1.75; color: var(--murk); max-width: 68ch; }
+    .step-tag { display: inline-block; margin-top: 12px; padding: 4px 12px; background: var(--phosphor-wash); border: 1px solid var(--ink-line-strong); border-radius: 999px; font-family: var(--font-mono); font-size: 10.5px; color: var(--phosphor); }
+
+    /* PURPOSE */
+    .section-purpose { background: var(--abyss-0); border-top: 1px solid var(--ink-line); }
+    .purpose-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .purpose-copy p { font-size: 15.5px; line-height: 1.85; color: var(--murk); margin-bottom: 16px; max-width: 62ch; }
+    .purpose-caveat { font-size: 13px; color: var(--silt); font-style: italic; }
+    .purpose-quote {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: clamp(1.4rem, 2.4vw, 1.7rem);
+      line-height: 1.55;
+      color: var(--foam);
+      text-wrap: balance;
+    }
+    .purpose-quote::before {
+      content: '“';
+      display: block;
+      font-size: 3em;
+      line-height: 0.6;
+      color: var(--phosphor-deep);
+      margin-bottom: 18px;
+    }
+
+    /* EVIDENCE */
+    .section-evidence { background: var(--abyss-1); border-top: 1px solid var(--ink-line); }
+    .evidence-layout { display: grid; grid-template-columns: 1fr 1.3fr; gap: 60px; align-items: start; }
+    .evidence-copy p { font-size: 15px; line-height: 1.8; color: var(--murk); margin-bottom: 20px; max-width: 60ch; }
+    .evidence-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--abyss-2); border: 1px solid var(--ink-line); border-radius: var(--radius-lg); overflow: hidden; }
+    .evidence-table th { background: var(--abyss-0); padding: 12px 14px; text-align: left; font-family: var(--font-plate); font-size: 12.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--silt); border-bottom: 1px solid var(--ink-line); }
+    .evidence-table td { padding: 11px 14px; border-bottom: 1px solid var(--ink-line); color: var(--murk); font-family: var(--font-mono); font-size: 12.5px; }
+    .evidence-table tr:last-child td { border-bottom: none; }
+    .evidence-table td.improved { color: var(--phosphor); font-weight: 600; }
+    .evidence-note { background: var(--phosphor-wash); border: 1px solid var(--ink-line-strong); border-radius: var(--radius); padding: 16px 18px; margin-top: 20px; font-size: 13px; color: var(--murk); line-height: 1.7; }
+    .dataset-line { font-family: var(--font-mono); font-size: 10.5px; color: var(--silt); margin-top: 12px; letter-spacing: 0.03em; }
+
+    /* CLOSING */
+    .section-closing {
+      position: relative;
+      padding: 120px 32px;
+      overflow: hidden;
+      text-align: center;
+      background: var(--abyss-0);
+      border-top: 1px solid var(--ink-line);
+    }
+    .closing-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 60%, rgba(60, 245, 200, 0.06) 0%, transparent 60%);
+    }
+    .closing-inner { position: relative; z-index: 2; max-width: 640px; margin: 0 auto; }
+    .closing-headline { font-family: var(--font-display); font-weight: 300; font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.1; color: var(--foam); margin-bottom: 24px; text-wrap: balance; }
+    .closing-sub { font-size: clamp(15px, 1.5vw, 17px); line-height: 1.75; color: var(--murk); margin-bottom: 48px; max-width: 52ch; margin-left: auto; margin-right: auto; }
+    .closing-actions { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+
+    /* FOOTER */
+    .site-footer {
+      padding: 26px 32px 34px;
+      border-top: 1px solid var(--ink-line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-text { font-family: var(--font-mono); font-size: 11px; color: var(--silt); letter-spacing: 0.03em; }
+    .footer-status { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--silt); }
+    .footer-status .dot { width: 7px; height: 7px; background: var(--phosphor); border-radius: 50%; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      section { padding: 60px 20px; }
+      .problem-layout, .purpose-layout, .evidence-layout { grid-template-columns: 1fr; gap: 40px; }
+      .problem-visual { height: 260px; }
+      .nav-links { display: none; }
+      .site-nav { padding: 12px 20px; }
+      .hero { padding: 60px 20px 80px; }
+      .section-closing { padding: 80px 20px; }
+      .site-footer { flex-direction: column; text-align: center; }
+      .workflow-step { grid-template-columns: 36px 1fr; gap: 16px; }
+      .step-node { width: 36px; height: 36px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" id="siteNav" aria-label="Main navigation">
+    <a href="/" class="nav-brand" aria-label="NEMO home">
+      <div class="nav-brand-icon" aria-hidden="true">N</div>
+      <span class="nav-brand-text">NEMO</span>
+    </a>
+    <ul class="nav-links" role="list">
+      <li><a href="/console">Console</a></li>
+      <li><a href="/about" class="active" aria-current="page">Method</a></li>
+    </ul>
+    <a href="/console" class="nav-cta">Open Console</a>
+  </nav>
+
+  <section class="hero" id="hero" aria-labelledby="hero-headline">
+    <div class="hero-bg" aria-hidden="true"><img class="hero-photo" src="/assets/about-sonar.jpg" alt=""></div>
+    <div class="hero-scan" aria-hidden="true"></div>
+    <div class="hero-overlay" aria-hidden="true"></div>
+    <div class="hero-content">
+      <div class="hero-kicker">System &amp; method</div>
+      <h1 class="hero-headline" id="hero-headline">
+        Making the unseen visible<br>beneath the waves.
+      </h1>
+      <p class="hero-subtitle">
+        NEMO uses AI-assisted sonar analysis to identify potential underwater hazards and turn detections into structured, location-aware reports.
+      </p>
+      <div class="hero-cta-row">
+        <a href="/console" class="btn-primary">Explore the Console</a>
+        <a href="#problem" class="btn-ghost">Technical Approach</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-problem" id="problem" aria-labelledby="problem-heading">
+    <div class="section-inner">
+      <div class="problem-layout">
+        <div class="problem-copy">
+          <div class="section-kicker">The difficulty</div>
+          <h2 class="section-heading" id="problem-heading" style="margin-bottom: 20px;">
+            The ocean floor is difficult to inspect, and even harder to interpret.
+          </h2>
+          <p>
+            Marine debris, abandoned equipment, and other underwater hazards can be difficult to locate using conventional visual inspection alone. Side-scan sonar helps survey large areas, but the resulting imagery can contain ambiguous shapes, shadows, and seabed structures that closely resemble objects of interest.
+          </p>
+          <p>
+            Reliably distinguishing a submerged aircraft from a rocky outcrop, or a shipwreck from an irregular seabed mound, requires careful analysis that conventional manual review struggles to scale.
+          </p>
+        </div>
+        <figure class="problem-visual">
+          <img src="/assets/hero-sonar.jpg" alt="Real side-scan sonar frame showing seabed texture and a submerged target">
+          <figcaption class="problem-caption">Real side-scan sonar from the validation set — the imagery analysts read today</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-workflow" aria-labelledby="workflow-heading">
+    <div class="section-inner">
+      <div style="margin-bottom:48px; max-width:560px;">
+        <div class="section-kicker">The pipeline</div>
+        <h2 class="section-heading" id="workflow-heading" style="margin-bottom: 16px;">
+          From sonar returns to actionable evidence.
+        </h2>
+        <p style="font-size: 15px; line-height: 1.75; color: var(--murk); max-width: 60ch;">
+          The current prototype implements a two-stage detection and verification pipeline, designed to reduce false positives while maintaining recall on known target categories.
+        </p>
+      </div>
+      <ol class="workflow-steps" aria-label="NEMO detection pipeline">
+        <li class="workflow-step">
+          <div class="step-node" aria-hidden="true">01</div>
+          <div>
+            <div class="step-label">Sonar Input</div>
+            <h3 class="step-title">Load a recorded sonar mission.</h3>
+            <p class="step-desc">NEMO ingests side-scan sonar imagery from supported recorded mission packages. Each image represents a grayscale acoustic-intensity capture from the sonar transducer, processed as a native single-channel input.</p>
+          </div>
+        </li>
+        <li class="workflow-step">
+          <div class="step-node" aria-hidden="true">02</div>
+          <div>
+            <div class="step-label">AI Detection</div>
+            <h3 class="step-title">YOLO11n proposes candidate objects.</h3>
+            <p class="step-desc">A YOLO11n model adapted for native one-channel sonar input proposes bounding-box candidates around regions of interest. The detector prioritizes recall, ensuring potential targets are not missed before the verification stage.</p>
+            <span class="step-tag">YOLO11n · 640×640 · 1-channel native input</span>
+          </div>
+        </li>
+        <li class="workflow-step">
+          <div class="step-node" aria-hidden="true">03</div>
+          <div>
+            <div class="step-label">Candidate Verification</div>
+            <h3 class="step-title">MobileNetV3 evaluates each crop.</h3>
+            <p class="step-desc">A MobileNetV3-Small verifier independently evaluates each candidate crop as target-like or background. In prototype evaluation on the KLSG dataset, this reduced false positives from 19 to 16 while retaining recall.</p>
+            <span class="step-tag">MobileNetV3-Small · Binary verification · Target vs Background</span>
+          </div>
+        </li>
+        <li class="workflow-step">
+          <div class="step-node" aria-hidden="true">04</div>
+          <div>
+            <div class="step-label">Metadata Association</div>
+            <h3 class="step-title">Link detections to available coordinates.</h3>
+            <p class="step-desc">When valid navigation metadata is present, detections are associated with mission coordinates. If coordinate mapping is absent or unreliable, the detection is marked as location-unavailable rather than assigned inferred data.</p>
+          </div>
+        </li>
+        <li class="workflow-step">
+          <div class="step-node" aria-hidden="true">05</div>
+          <div>
+            <div class="step-label">Structured Reporting</div>
+            <h3 class="step-title">Export detections in CSV or JSON.</h3>
+            <p class="step-desc">Detections are presented in the NEMO console with bounding coordinates, confidence scores, verifier decisions, and location status. Reports can be downloaded as CSV or JSON for further review and inspection planning.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section-purpose" aria-labelledby="purpose-heading">
+    <div class="section-inner">
+      <div class="purpose-layout">
+        <div class="purpose-copy">
+          <div class="section-kicker">The stance</div>
+          <h2 class="section-heading" id="purpose-heading" style="margin-bottom: 20px;">
+            Better detection is only the beginning.
+          </h2>
+          <p>
+            NEMO aims to help survey operators review sonar imagery more efficiently, not by automating decisions, but by surfacing likely candidates for human review and organizing evidence into traceable, structured reports.
+          </p>
+          <p>
+            Each detection is presented with its source image, bounding coordinates, confidence score, verifier decision, and available location metadata. The analyst reviews; the system organizes.
+          </p>
+          <p class="purpose-caveat">NEMO is a prototype. Claims of autonomous cleanup, proven field deployment, real-time AUV integration, or guaranteed detection accuracy are out of scope for the current system version.</p>
+        </div>
+        <blockquote class="purpose-quote" cite="#">
+          Sonar analysis is a skill. NEMO is a tool that aims to make that skill scale, by highlighting what matters and organizing what it finds.
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-evidence" aria-labelledby="evidence-heading">
+    <div class="section-inner">
+      <div class="evidence-layout">
+        <div class="evidence-copy">
+          <div class="section-kicker">Preliminary findings</div>
+          <h2 class="section-heading" id="evidence-heading" style="margin-bottom: 16px;">
+            Built through experimentation.
+          </h2>
+          <p>
+            The prototype was evaluated through controlled ablation experiments comparing input representations, detector scales, preprocessing choices, and two-stage pipeline configurations. These inform the current architecture selection.
+          </p>
+          <div class="evidence-note">
+            Results are from evaluation on the KLSG frozen test set: aircraft and shipwreck target subset, on an NVIDIA Tesla T4. These are preliminary findings and should not be generalized to all ocean environments or debris categories.
+          </div>
+        </div>
+        <div>
+          <div class="evidence-table-wrapper">
+            <table class="evidence-table" aria-label="T4 pipeline evaluation results">
+              <thead>
+                <tr><th scope="col">Metric</th><th scope="col">YOLO11n-1C only</th><th scope="col">Plus MobileNetV3</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Precision</td><td>0.7031</td><td class="improved">0.7377</td></tr>
+                <tr><td>Recall</td><td>0.8654</td><td>0.8654</td></tr>
+                <tr><td>F1 Score</td><td>0.7759</td><td class="improved">0.7965</td></tr>
+                <tr><td>False Positives</td><td>19</td><td class="improved">16</td></tr>
+                <tr><td>Latency</td><td>15.6 ms per image</td><td>27.2 ms per image</td></tr>
+                <tr><td>Throughput</td><td>~64 FPS</td><td>~37 FPS</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="dataset-line">KLSG dataset · Aircraft + shipwreck target subset · NVIDIA Tesla T4 · Preliminary evaluation · v0.1.0-mdp</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-closing" aria-labelledby="closing-headline">
+    <div class="closing-bg" aria-hidden="true"></div>
+    <div class="closing-inner">
+      <h2 class="closing-headline" id="closing-headline">
+        Explore what lies beneath.
+      </h2>
+      <p class="closing-sub">NEMO is a prototype exploring how AI-assisted sonar analysis can support underwater anomaly detection and structured reporting.</p>
+      <div class="closing-actions">
+        <a href="/console" class="btn-primary">Explore the Console</a>
+        <a href="/console" class="btn-ghost" data-goto="system">View the Technical Approach</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p class="footer-text">NEMO · AI-powered underwater marine debris detection · Smart India Hackathon 2025 · v0.1.0-mdp</p>
+    <div class="footer-status"><span class="dot"></span>Prototype · Recorded Mission Mode</div>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('siteNav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    document.querySelector('[data-goto]').addEventListener('click', function (e) {
+      e.preventDefault();
+      sessionStorage.setItem('nemo_goto_screen', 'system');
+      window.location.href = '/console';
+    });
+  </script>
+</body>
+</html>

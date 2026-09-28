@@ -58,11 +58,24 @@ def train():
     from models.mobilenetv3.dataset import CropDataset
     from torch.utils.data import DataLoader
 
-    verifier_cfg = cfg.get("verifier", {})
+    verifier_cfg = cfg.get("verifier", cfg)
+    if "config" in verifier_cfg and Path(verifier_cfg["config"]).exists():
+        with open(verifier_cfg["config"]) as f:
+            sub_cfg = yaml.safe_load(f) or {}
+            # Merge sub-config values
+            for k, v in sub_cfg.items():
+                if k not in verifier_cfg:
+                    verifier_cfg[k] = v
+
+    crop_size = verifier_cfg.get("crop_size") or verifier_cfg.get("model", {}).get("image_size", 128)
+    in_channels = verifier_cfg.get("input_channels") or verifier_cfg.get("model", {}).get("input_channels", 1)
+    num_classes = verifier_cfg.get("num_classes") or verifier_cfg.get("model", {}).get("num_classes", 2)
+    conf_threshold = verifier_cfg.get("confidence_threshold", 0.5)
+
     model = MobileNetV3Verifier(
-        in_channels=verifier_cfg.get("input_channels", 1),
-        num_classes=verifier_cfg.get("num_classes", 2),
-        conf_threshold=verifier_cfg.get("confidence_threshold", 0.5),
+        in_channels=in_channels,
+        num_classes=num_classes,
+        conf_threshold=conf_threshold,
     ).to(device)
     logger.info("Model: %.2fM params", sum(p.numel() for p in model.parameters()) / 1e6)
 
@@ -91,14 +104,23 @@ def train():
 
     # Build dataset
     dataset_cfg = verifier_cfg.get("dataset", {})
-    default_root = "data/raw/marine_pulse" if Path("data/raw/marine_pulse").exists() else "data/hard_negatives"
+    default_root = "data/raw/opensonardatasets/Marine_PULSE 2" if Path("data/raw/opensonardatasets/Marine_PULSE 2").exists() else (
+        "data/raw/marine_pulse" if Path("data/raw/marine_pulse").exists() else "data/hard_negatives"
+    )
     root = args.data or dataset_cfg.get("root", default_root)
-    crop_size = verifier_cfg.get("crop_size", 128)
 
     root_path = Path(root)
     if (root_path / "train").exists():
         train_dataset = CropDataset(root=root_path / "train", crop_size=crop_size)
-        val_dataset = CropDataset(root=root_path / "val", crop_size=crop_size)
+        val_dir = root_path / "val" if (root_path / "val").exists() else root_path / "test"
+        if val_dir.exists():
+            val_dataset = CropDataset(root=val_dir, crop_size=crop_size)
+        else:
+            val_size = max(1, int(len(train_dataset) * 0.15))
+            train_size = len(train_dataset) - val_size
+            train_dataset, val_dataset = torch.utils.data.random_split(
+                train_dataset, [train_size, val_size], generator=torch.Generator().manual_seed(42)
+            )
     else:
         full_dataset = CropDataset(root=root_path, crop_size=crop_size)
         if len(full_dataset) > 0:
@@ -204,6 +226,7 @@ def train():
                 "val_acc": val_acc,
             }
             torch.save(checkpoint, save_dir / "mobilenetv3_verifier_best.pt")
+            torch.save(checkpoint, save_dir / "mobilenetv3_verifier.pt")
             torch.save(checkpoint, save_dir / f"mobilenetv3_verifier_epoch_{epoch}.pt")
             logger.info("Saved checkpoint (val_acc=%.3f)", val_acc)
 

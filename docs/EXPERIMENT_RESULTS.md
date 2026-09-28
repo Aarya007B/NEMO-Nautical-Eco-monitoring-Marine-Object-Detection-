@@ -8,17 +8,24 @@ This document records the measured experimental results from the NEMO architectu
 
 ## T1: Input Representation Comparison
 
-**Objective:** Compare 3-channel RGB, native 1-channel, and preprocessed 1-channel input representations for YOLO11n detection.
+**Objective:** Compare 3-channel RGB, native 1-channel (CASE C), and preprocessed 1-channel input representations for YOLO11n detection.
 
 **Dataset:** KLSG / SeabedObjects validation set
 
-| Variant | mAP50 | mAP50-95 | Precision | Recall | Latency (ms) |
-|---------|-------|----------|-----------|--------|-------------|
-| T1-A: YOLO11n 3-channel | 0.4293 | 0.2355 | 0.6892 | 0.3762 | ~14.0 |
-| T1-B: YOLO11n native 1-channel | 0.5939 | 0.3062 | 0.6787 | 0.5259 | ~14.54 |
-| T1-C: 1-channel + normalization + CLAHE | 0.4931 | 0.3194 | 0.3771 | 0.5660 | ~18.26 |
+| Variant | Architecture / Representation | mAP50 | mAP50-95 | Precision | Recall | Latency (ms) |
+|---------|-------------------------------|-------|----------|-----------|--------|-------------|
+| T1-A: YOLO11n 3-channel | CASE A: Conv2d(3, 16, ...) on [B, 3, H, W] RGB | 0.4293 | 0.2355 | 0.6892 | 0.3762 | ~14.0 |
+| T1-B: YOLO11n native 1-channel | CASE C: Conv2d(1, 16, ...) on [B, 1, H, W] native 1C | 0.5939 | 0.3062 | 0.6787 | 0.5259 | ~14.54 |
+| T1-C: 1-channel + normalization + CLAHE | CASE C: Conv2d(1, 16, ...) on preprocessed 1C | 0.4931 | 0.3194 | 0.3771 | 0.5660 | ~18.26 |
 
-**Conclusion:** Native 1-channel input (T1-B) achieved the highest mAP50 (0.5939) with the best precision-recall balance. The preprocessed variant (T1-C) increased recall but at the cost of significantly reduced precision (0.3771). Native 1-channel was selected as the MVP input representation.
+**Architectural Configurations:**
+- **CASE A (T1-A):** Standard 3-channel model with `Conv2d(3, 16, ...)`.
+- **CASE B (Grayscale Replicated):** Passing `[I, I, I]` into an unchanged 3-channel model `Conv2d(3, 16, ...)`. *(Not selected).*
+- **CASE C (T1-B, Validated MVP):** True native 1-channel model with `Conv2d(1, 16, ...)`. The model itself was adapted to accept a single-channel tensor `[B, 1, 640, 640]`. First convolution weights were initialized from original pretrained filters via:
+  $$W_{\text{new}} = \text{mean}(W, \text{dim}=\text{channel}) \in \mathbb{R}^{C_{\text{out}} \times 1 \times k \times k}$$
+  The native 1-channel first-layer weights were initialized from original pretrained 3-channel filters by averaging across the input-channel dimension, while the remaining compatible pretrained layers were retained.
+
+**Conclusion:** Native 1-channel input (T1-B, CASE C) achieved the highest mAP50 (0.5939) with the best precision-recall balance. The preprocessed variant (T1-C) increased recall but at the cost of significantly reduced precision (0.3771). Native 1-channel was selected as the MVP input representation.
 
 ---
 

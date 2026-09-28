@@ -115,14 +115,17 @@ python tools/smoke_test.py
 
 The dashboard uses a **FastAPI REST backend** with a vanilla HTML/JS frontend.
 
-### Start the API server:
+### Start the API server (run from the repository root):
 ```bash
 python main.py --mode api --config configs/config.yaml
 ```
-Server runs at `http://localhost:8000`.
 
 ### Open the dashboard:
-Open `dashboard/index.html` in a browser.
+Open `http://localhost:8000/` in a browser — a landing page telling the
+story, with the ops console behind it at `http://localhost:8000/console`.
+> The server hosts the pages itself. Do not open HTML files
+> directly from the filesystem (`file://`) — the pages need the running
+> API for missions, uploads, and detection.
 
 ### API Endpoints:
 ```
