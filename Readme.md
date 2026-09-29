@@ -1,3 +1,5 @@
+![NEMO — See Beneath the Surface](assets/banner.jpg)
+
 # NEMO 🌊
 ### AI-Powered Underwater Marine Debris & Anomaly Detection System
 
