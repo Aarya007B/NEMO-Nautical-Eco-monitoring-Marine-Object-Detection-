@@ -461,11 +461,14 @@
           <h2>Watch NEMO run a real mission.</h2>
           <p>This recording walks through a real run: <strong>create mission → analysis → geospatial view → reports</strong>.</p>
         </div>
-        <div class="reveal" style="border:1px solid var(--ink-line);border-radius:14px;overflow:hidden;background:#000;">
-          <video controls preload="metadata" poster="assets/hero-sonar.jpg" style="display:block;width:100%;height:auto;">
+        <div class="reveal" style="position:relative;border:1px solid var(--ink-line);border-radius:14px;overflow:hidden;background:#000;">
+          <video id="demo-video" controls preload="metadata" style="display:block;width:100%;height:auto;background:#000;">
             <source src="assets/demo.mp4" type="video/mp4">
             Your browser can't play the demo video.
           </video>
+          <button id="demo-play" aria-label="Play the console demo" style="position:absolute;inset:0;margin:auto;width:88px;height:88px;border-radius:50%;background:var(--phosphor);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 32px rgba(0,0,0,0.55),0 0 0 14px rgba(60,245,200,0.16);transition:transform 180ms cubic-bezier(0.16,1,0.3,1),box-shadow 180ms cubic-bezier(0.16,1,0.3,1);">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="#04241B" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          </button>
         </div>
       </div>
     </section>
@@ -523,6 +526,22 @@
         vid.removeAttribute('autoplay');
         vid.pause();
       }
+    })();
+    (function () {
+      // Big centered play button for the demo video: hides while playing,
+      // returns when paused or finished so judges always see the affordance.
+      var playBtn = document.getElementById('demo-play');
+      var demoVid = document.getElementById('demo-video');
+      if (!playBtn || !demoVid) return;
+      playBtn.addEventListener('click', function () {
+        demoVid.play();
+      });
+      demoVid.addEventListener('play', function () {
+        playBtn.style.display = 'none';
+      });
+      demoVid.addEventListener('pause', function () {
+        playBtn.style.display = 'flex';
+      });
     })();
     (function () {
       var els = document.querySelectorAll('.reveal');
