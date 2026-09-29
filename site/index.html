@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<!--
+  NEMO landing · direction contract
+  THESIS: judges meet the ocean problem first and the instrument second; a
+  cinematic editorial surface that refuses the dashboard-as-homepage default.
+  OWN-WORLD: console tokens (abyssal navy, phosphor seafoam) + Spectral light
+  serif reserved for persuasion headlines; full-bleed REAL sonar imagery as the
+  only hero asset — what NEMO sees is the backdrop.
+  STORY: visitor feels the debris problem, grasps detect→verify→evidence in
+  three steps, believes via labeled preliminary metrics, opens the console.
+  FIRST VIEWPORT: full-viewport sonar frame, kicker, serif H1, lede, two CTAs.
+  FORM: Persuade, restrained color; one authored motion (hero drift + single
+  reveal); every claim traced to product truth, prototype honesty on screen.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEMO — Finding what the ocean hides</title>
+  <meta name="description" content="NEMO is an AI-powered side-scan sonar system that detects marine debris: YOLO11n proposes candidates, MobileNetV3 verifies them, every contact ships as reviewable evidence.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --abyss-0: #04090F;
+      --abyss-1: #081220;
+      --abyss-2: #0C1A2C;
+      --ink-line: rgba(120, 200, 190, 0.14);
+      --ink-line-strong: rgba(120, 200, 190, 0.32);
+      --phosphor: #3CF5C8;
+      --phosphor-deep: #0E9F7E;
+      --foam: #EAF6F1;
+      --murk: #9DB8B2;
+      --silt: #647E7A;
+      --amber: #FFB454;
+      --font-display: 'Spectral', Georgia, serif;
+      --font-plate: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--abyss-0);
+      color: var(--foam);
+      -webkit-font-smoothing: antialiased;
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    ::selection { background: var(--phosphor); color: #04241B; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--phosphor); outline-offset: 3px; }
+
+    .wrap { max-width: 1160px; margin: 0 auto; padding: 0 32px; }
+    .kicker {
+      font-family: var(--font-plate);
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--phosphor);
+    }
+    .kicker::after {
+      content: '';
+      display: block;
+      width: 44px; height: 1px;
+      background: var(--phosphor-deep);
+      margin-top: 10px;
+    }
+    .kicker.centered { text-align: center; }
+    .kicker.centered::after { margin-left: auto; margin-right: auto; }
+
+    /* ---- Nav ---- */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 36px;
+      background: linear-gradient(to bottom, rgba(4, 9, 15, 0.88), rgba(4, 9, 15, 0));
+    }
+    .nav-mark {
+      font-family: var(--font-plate);
+      font-weight: 700; font-size: 22px; letter-spacing: 0.16em;
+      color: var(--foam); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 30px; align-items: center; }
+    .nav-links a:not(.btn) {
+      color: var(--murk); text-decoration: none; font-size: 14px; font-weight: 500;
+      transition: color 180ms var(--ease-out);
+    }
+    .nav-links a:not(.btn):hover { color: var(--foam); }
+    .sound-toggle {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(8, 18, 32, 0.72);
+      border: 1px solid var(--ink-line-strong);
+      color: var(--murk);
+      cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: color 180ms var(--ease-out), border-color 180ms var(--ease-out), background 180ms var(--ease-out);
+      padding: 0;
+    }
+    .sound-toggle:hover { color: var(--phosphor); border-color: var(--phosphor); }
+    .sound-toggle.playing { color: var(--phosphor); border-color: var(--phosphor); background: var(--phosphor-wash); }
+    .sound-toggle svg { width: 18px; height: 18px; }
+    .sound-toggle .icon-pause { display: none; }
+    .sound-toggle.playing .icon-pause { display: block; }
+    .sound-toggle.playing .icon-play { display: none; }
+    .nav-cluster { display: flex; align-items: center; gap: 14px; }
+    .btn {
+      display: inline-block;
+      font-family: var(--font-sans);
+      font-weight: 700; font-size: 15px;
+      padding: 13px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 180ms var(--ease-out), transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+    }
+    .btn-primary {
+      background: var(--phosphor); color: #04241B;
+      box-shadow: 0 2px 0 var(--phosphor-deep), 0 12px 28px rgba(0, 0, 0, 0.5);
+    }
+    .btn-primary:hover { background: #6FF7D4; }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-ghost {
+      background: transparent; color: var(--foam);
+      border: 1px solid var(--ink-line-strong);
+    }
+    .btn-ghost:hover { border-color: var(--phosphor); color: var(--phosphor); }
+
+    /* ---- Hero ---- */
+    .hero { position: relative; min-height: 100svh; display: flex; align-items: flex-end; overflow: hidden; }
+    .hero-bg { position: absolute; inset: -4%; z-index: 0; }
+    .hero-bg video { width: 100%; height: 100%; object-fit: cover; }
+    .hero-shade {
+      position: absolute; inset: 0; z-index: 1;
+      background:
+        linear-gradient(to bottom, rgba(4, 9, 15, 0.52) 0%, rgba(4, 9, 15, 0.24) 34%, rgba(4, 9, 15, 0.62) 62%, var(--abyss-0) 100%);
+    }
+    .hero-inner { position: relative; z-index: 2; padding-bottom: 13vh; max-width: 1160px; margin: 0 auto; padding-left: 32px; padding-right: 32px; width: 100%; }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: clamp(2.9rem, 7vw, 5.6rem);
+      line-height: 1.04;
+      letter-spacing: -0.01em;
+      color: var(--foam);
+      text-wrap: balance;
+      max-width: 16ch;
+      margin: 26px 0 22px;
+    }
+    .hero h1 em { font-style: italic; color: var(--phosphor); }
+    .hero-lede { font-size: clamp(1rem, 1.6vw, 1.2rem); color: var(--murk); max-width: 58ch; margin-bottom: 36px; }
+    .hero-lede strong { color: var(--foam); font-weight: 600; }
+    .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 26px; }
+    .scroll-cue {
+      position: absolute; z-index: 2; right: 36px; bottom: 13vh;
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em;
+      color: var(--silt); writing-mode: vertical-rl;
+    }
+    .scroll-cue::after { content: ''; display: block; width: 1px; height: 56px; background: var(--phosphor-deep); margin: 12px auto 0; }
+
+    /* ---- Sections ---- */
+    section.block { padding: 120px 0; }
+    .block-head { max-width: 720px; margin-bottom: 64px; }
+    .block-head h2 {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: clamp(2rem, 4.4vw, 3.2rem);
+      line-height: 1.1;
+      text-wrap: balance;
+      margin: 24px 0 18px;
+    }
+    .block-head p { color: var(--murk); font-size: 17px; max-width: 62ch; }
+    .block-head p strong { color: var(--foam); }
+
+    .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    .problem-copy p { color: var(--murk); font-size: 17px; margin-bottom: 22px; max-width: 60ch; }
+    .problem-copy p strong { color: var(--foam); }
+    .problem-copy p:first-of-type::first-letter {
+      font-family: var(--font-display);
+      font-size: 3.4em; line-height: 0.9;
+      float: left; margin: 6px 12px 0 0;
+      color: var(--phosphor);
+    }
+    .fact-rail { border-top: 1px solid var(--ink-line); }
+    .fact { padding: 26px 0; border-bottom: 1px solid var(--ink-line); }
+    .fact .fact-num { font-family: var(--font-mono); font-size: 30px; color: var(--phosphor); font-variant-numeric: tabular-nums; }
+    .fact .fact-cap { font-size: 14px; color: var(--murk); margin-top: 6px; max-width: 44ch; }
+
+    /* ---- Method steps ---- */
+    .steps { border-top: 1px solid var(--ink-line); }
+    .step {
+      display: grid;
+      grid-template-columns: 110px 1fr 1fr;
+      gap: 40px;
+      padding: 56px 0;
+      border-bottom: 1px solid var(--ink-line);
+      align-items: start;
+    }
+    .step-num { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.14em; color: var(--phosphor-deep); padding-top: 8px; }
+    .step-body h3 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(1.5rem, 2.6vw, 2rem);
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+    .step-body p { color: var(--murk); font-size: 16px; max-width: 56ch; }
+    .step-body p strong { color: var(--foam); }
+    .step-body .mono-tag { display: inline-block; font-family: var(--font-mono); font-size: 11.5px; color: var(--phosphor); border: 1px solid var(--ink-line-strong); border-radius: 999px; padding: 4px 12px; margin-bottom: 16px; }
+    .step-fig {
+      background: var(--abyss-2);
+      border: 1px solid var(--ink-line);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(180, 255, 240, 0.06), 0 14px 30px rgba(0, 0, 0, 0.35);
+    }
+    .step-fig img { display: block; width: 100%; height: auto; background: #000; }
+    .step-fig figcaption { font-family: var(--font-mono); font-size: 11.5px; color: var(--silt); padding: 12px 16px; line-height: 1.6; }
+    .step-fig figcaption strong { color: var(--murk); }
+
+    /* ---- Evidence band ---- */
+    .evidence { background: var(--abyss-1); border-top: 1px solid var(--ink-line); border-bottom: 1px solid var(--ink-line); }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); margin: 56px 0 8px; border-top: 3px solid var(--phosphor-deep); }
+    .metric { padding: 30px 28px 26px; border-right: 1px solid var(--ink-line); }
+    .metric:last-child { border-right: none; }
+    .metric .m-label { font-family: var(--font-plate); text-transform: uppercase; letter-spacing: 0.1em; font-size: 13px; font-weight: 600; color: var(--silt); }
+    .metric .m-value { font-family: var(--font-mono); font-size: 38px; color: var(--foam); margin: 10px 0 4px; font-variant-numeric: tabular-nums; }
+    .metric .m-value em { font-style: normal; color: var(--phosphor); }
+    .metric .m-sub { font-size: 13px; color: var(--silt); }
+    .evidence-note { font-family: var(--font-mono); font-size: 12px; color: var(--silt); margin-top: 26px; }
+
+    .honesty {
+      display: flex; gap: 16px; align-items: flex-start;
+      border: 1px solid var(--ink-line);
+      border-radius: 12px;
+      background: var(--abyss-2);
+      padding: 22px 26px;
+      margin-top: 64px;
+      color: var(--murk); font-size: 15px; line-height: 1.7;
+    }
+    .honesty .plate {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em;
+      color: var(--phosphor-deep); border: 1px solid var(--ink-line-strong);
+      border-radius: 4px; padding: 4px 9px; white-space: nowrap; margin-top: 3px;
+    }
+
+    /* ---- Closing ---- */
+    .closing { text-align: center; padding: 140px 0 130px; }
+    .closing h2 {
+      font-family: var(--font-display); font-weight: 300;
+      font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.08;
+      text-wrap: balance; max-width: 20ch; margin: 26px auto 20px;
+    }
+    .closing p { color: var(--murk); max-width: 56ch; margin: 0 auto 38px; font-size: 17px; }
+    footer {
+      border-top: 1px solid var(--ink-line);
+      padding: 30px 0 40px;
+      display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+      font-family: var(--font-mono); font-size: 12px; color: var(--silt);
+    }
+    footer a { color: var(--murk); text-decoration: none; margin-left: 22px; }
+    footer a:hover { color: var(--phosphor); }
+
+    .reveal { opacity: 0; transform: translateY(26px); transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out); }
+    .reveal.in { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+    @media (max-width: 900px) {
+      .problem-grid { grid-template-columns: 1fr; gap: 48px; }
+      .step { grid-template-columns: 1fr; gap: 24px; padding: 44px 0; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric:nth-child(2) { border-right: none; }
+      .metric:nth-child(1), .metric:nth-child(2) { border-bottom: 1px solid var(--ink-line); }
+      .nav-links a:not(.btn) { display: none; }
+      .scroll-cue { display: none; }
+      section.block { padding: 84px 0; }
+    }
+    @media (max-width: 560px) {
+      .metrics { grid-template-columns: 1fr; }
+      .metric { border-right: none; border-bottom: 1px solid var(--ink-line); }
+      .metric:last-child { border-bottom: none; }
+      .wrap { padding: 0 22px; }
+      .nav { padding: 14px 22px; }
+      .hero-inner { padding-left: 22px; padding-right: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav" aria-label="Primary">
+    <a class="nav-mark" href="#top">NEMO</a>
+    <div class="nav-links">
+      <a href="#problem">The problem</a>
+      <a href="#method">How it works</a>
+      <a href="#evidence">Evidence</a>
+      <div class="nav-cluster">
+        <button class="sound-toggle" id="sound-toggle" aria-label="Play ocean ambience" aria-pressed="false">
+          <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 4 20 12 6 20" fill="currentColor" stroke="none"/></svg>
+          <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+        </button>
+        <a class="btn btn-primary" href="#demo">Watch the console demo</a>
+      </div>
+    </div>
+  </nav>
+
+  <audio id="ocean-audio" src="assets/ocean-ambience.mp3" preload="none" loop></audio>
+
+  <header class="hero" id="top">
+    <div class="hero-bg" aria-hidden="true">
+      <video id="hero-video" autoplay muted loop playsinline preload="metadata" poster="assets/hero-sonar.jpg">
+        <source src="assets/hero-ocean.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="hero-shade" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <div class="kicker">Marine debris · AI detection</div>
+      <h1>What the ocean hides, <em>NEMO finds.</em></h1>
+      <p class="hero-lede">Every survey mission returns hours of seabed sonar that no human team can fully review. NEMO (<strong>Nautical Eco-monitoring Marine Object detection</strong>) flags candidate debris automatically and verifies each contact, so inspection and cleanup crews start from evidence instead of empty water.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#demo">Watch the console demo</a>
+        <a class="btn btn-ghost" href="#method">How it works</a>
+      </div>
+    </div>
+    <div class="scroll-cue" aria-hidden="true">DESCEND</div>
+  </header>
+
+  <main>
+    <section class="block" id="problem">
+      <div class="wrap">
+        <div class="block-head reveal">
+          <div class="kicker">The problem</div>
+          <h2>Debris sinks. Attention shouldn't have to.</h2>
+          <p>Lost nets, wreckage, and dumped waste settle onto the seabed where divers can't patrol and cameras can't reach. Side-scan sonar can see it. But every hour of survey produces hours of imagery, and <strong>almost all of it is empty seabed</strong>.</p>
+        </div>
+        <div class="problem-grid">
+          <div class="problem-copy reveal">
+            <p>Today, finding debris means operators staring at vast stretches of nothing, ping by ping, hoping fatigue doesn't bury a contact. It is slow, expensive, and misses things, while ghost gear keeps fishing and wreckage keeps leaching.</p>
+            <p>Worse, <strong>the seabed itself mimics debris</strong>. Rocks, ridges, sand ripples, and shadows all look target-like to a tired eye, and to a naive detector. Every false alarm that reaches a dive team burns fuel, daylight, and trust.</p>
+            <p>NEMO exists to break that tradeoff: <strong>machine eyes for the empty miles, human judgment for the contacts that matter</strong>.</p>
+          </div>
+          <div class="fact-rail reveal" aria-label="Why this is hard">
+            <div class="fact">
+              <div class="fact-num">∅</div>
+              <div class="fact-cap">most of every survey swath is empty seabed, yet all of it must be reviewed today.</div>
+            </div>
+            <div class="fact">
+              <div class="fact-num">2 stages</div>
+              <div class="fact-cap">because one model can't do both jobs: finding candidates takes recall, dismissing rocks takes skepticism.</div>
+            </div>
+            <div class="fact">
+              <div class="fact-num">1 package</div>
+              <div class="fact-cap">every surviving contact ships as evidence (box, scores, crop, coordinates) ready for a cleanup decision.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="method" style="padding-top:0;">
+      <div class="wrap">
+        <div class="block-head reveal">
+          <div class="kicker">How NEMO tackles it</div>
+          <h2>Propose boldly. Verify skeptically.</h2>
+          <p>A two-model pipeline tuned for side-scan sonar. The first model is rewarded for <strong>never missing</strong>; the second is rewarded for <strong>never crying wolf</strong>.</p>
+        </div>
+        <div class="steps">
+          <div class="step reveal">
+            <div class="step-num">01 / PROPOSE</div>
+            <div class="step-body">
+              <span class="mono-tag">YOLO11n · 1-CHANNEL · 640 × 640</span>
+              <h3>The scout that never blinks</h3>
+              <p>A YOLO11n detector retuned for single-channel sonar sweeps every frame and localizes <strong>candidate objects</strong>: anything target-like, with a confidence score. Its job is recall: miss nothing, decide nothing.</p>
+            </div>
+            <figure class="step-fig">
+              <img src="assets/hero-sonar.jpg" alt="Real side-scan sonar frame showing seabed texture the detector sweeps">
+              <figcaption><strong>FIG. 01 —</strong> A real validation frame. The scout reads texture like this, dozens of frames per mission.</figcaption>
+            </figure>
+          </div>
+          <div class="step reveal">
+            <div class="step-num">02 / VERIFY</div>
+            <div class="step-body">
+              <span class="mono-tag">MOBILENETV3-SMALL · 128 × 128 CROPS</span>
+              <h3>The skeptic that kills false alarms</h3>
+              <p>Each candidate is cropped and handed to a MobileNetV3 verifier that classifies it <strong>artificial or natural</strong>. Rocks, ridges, and ripples die here. Only high-confidence targets reach your screen.</p>
+            </div>
+            <figure class="step-fig">
+              <img src="assets/evidence-crop.png" alt="Real 128-pixel verifier crop extracted from a candidate detection">
+              <figcaption><strong>FIG. 02 —</strong> A real verifier crop from a live detection. This is the evidence the skeptic judges.</figcaption>
+            </figure>
+          </div>
+          <div class="step reveal">
+            <div class="step-num">03 / EQUIP</div>
+            <div class="step-body">
+              <span class="mono-tag">CSV + JSON + CONSOLE</span>
+              <h3>Evidence a crew can act on</h3>
+              <p>Survivors are fused with detector confidence, acoustic features and, when the mission carries navigation data, <strong>real coordinates</strong>. Missions persist with reports you can download, filter, and dispatch from. No coordinates invented, ever.</p>
+            </div>
+            <div class="step-fig" style="padding:28px;">
+              <div style="font-family:var(--font-mono);font-size:12.5px;line-height:2;color:var(--murk);">
+                <div><span style="color:var(--silt);">detection_id</span> &nbsp;frame_0041_000_eb92aa</div>
+                <div><span style="color:var(--silt);">detector</span> &nbsp;<span style="color:var(--foam);">90.4%</span> &nbsp;&nbsp;<span style="color:var(--silt);">verifier</span> &nbsp;<span style="color:var(--phosphor);">ARTIFICIAL 95.6%</span></div>
+                <div><span style="color:var(--silt);">position</span> &nbsp;<span style="color:var(--foam);">from mission nav, or honestly empty</span></div>
+                <div><span style="color:var(--silt);">status</span> &nbsp;<span style="color:var(--phosphor);">● VERIFIED</span></div>
+              </div>
+              <figcaption style="padding:12px 0 0;"><strong>FIG. 03 —</strong> Synthetic mock of a report row's layout. Every figure inside the console is real pipeline output.</figcaption>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block evidence" id="evidence">
+      <div class="wrap">
+        <div class="block-head reveal" style="margin-bottom:0;">
+          <div class="kicker">Evidence, labeled</div>
+          <h2>The skeptic earns its keep.</h2>
+          <p>Preliminary evaluation on the KLSG aircraft + shipwreck subset (NVIDIA Tesla T4): adding the verifier <strong>lifts precision and F1 while cutting false positives</strong>, at a latency cost we show too.</p>
+        </div>
+        <div class="metrics reveal" role="group" aria-label="Preliminary evaluation metrics">
+          <div class="metric">
+            <div class="m-label">Precision</div>
+            <div class="m-value">0.70 → <em>0.74</em></div>
+            <div class="m-sub">fewer false alarms per contact</div>
+          </div>
+          <div class="metric">
+            <div class="m-label">F1 score</div>
+            <div class="m-value">0.78 → <em>0.80</em></div>
+            <div class="m-sub">recall held at 0.87 throughout</div>
+          </div>
+          <div class="metric">
+            <div class="m-label">False positives</div>
+            <div class="m-value">19 → <em>16</em></div>
+            <div class="m-sub">three fewer wasted dives</div>
+          </div>
+          <div class="metric">
+            <div class="m-label">Latency</div>
+            <div class="m-value">15.6 → <em>27.2</em><span style="font-size:16px;"> ms</span></div>
+            <div class="m-sub">the honest price of skepticism</div>
+          </div>
+        </div>
+        <p class="evidence-note reveal">PRELIMINARY EVALUATION · KLSG DATASET · AIRCRAFT + SHIPWRECK SUBSET · NVIDIA TESLA T4 · FIELD VALIDATION PENDING</p>
+        <div class="honesty reveal">
+          <span class="plate">PROTOTYPE</span>
+          <div>NEMO runs on recorded missions today; live-vehicle integration and field validation are future deployment stages. Nothing here poses as operational. Watch the console demo and every number traces to a real pipeline run.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block evidence" id="demo">
+      <div class="wrap">
+        <div class="block-head reveal">
+          <div class="kicker">Live console demo</div>
+          <h2>Watch NEMO run a real mission.</h2>
+          <p>The interactive console needs the Python backend + models, so it can't run on static hosting. This recording walks through a real run: <strong>create mission → analysis → geospatial view → reports</strong>. To replace: drop your screen recording at <strong>assets/demo.mp4</strong> (or paste a YouTube link below).</p>
+        </div>
+        <div class="reveal" style="border:1px solid var(--ink-line);border-radius:14px;overflow:hidden;background:#000;">
+          <video controls preload="metadata" poster="assets/hero-sonar.jpg" style="display:block;width:100%;height:auto;">
+            <source src="assets/demo.mp4" type="video/mp4">
+            Your browser can't play the demo video. Add assets/demo.mp4 next to this file.
+          </video>
+        </div>
+        <p class="evidence-note reveal">TIP: record at 1080p, ~2 min, narrate detect → verify → evidence. Keep this static page as the submission URL and play this video for judges.</p>
+      </div>
+    </section>
+
+    <section class="closing">
+      <div class="wrap">
+        <div class="kicker centered reveal">Take the watch</div>
+        <h2 class="reveal">The next contact is already on the seabed.</h2>
+        <p class="reveal">Create a mission from your own sonar frames, pair navigation data, and watch candidates become evidence. Built for operators, researchers, and the crews who clean up after all of us.</p>
+        <div class="hero-ctas reveal" style="justify-content:center;">
+          <a class="btn btn-primary" href="#demo">Watch the console demo</a>
+          <a class="btn btn-ghost" href="about.html">Read the method</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;width:100%;">
+      <span>NEMO · v0.1.0-mdp · prototype · not for operational deployment</span>
+      <span><a href="#demo">Console</a><a href="about.html">Method</a><a href="#top">Surface ↑</a></span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var btn = document.getElementById('sound-toggle');
+      var audio = document.getElementById('ocean-audio');
+      if (!btn || !audio) return;
+      btn.addEventListener('click', function () {
+        if (audio.paused) {
+          audio.play().then(function () {
+            btn.classList.add('playing');
+            btn.setAttribute('aria-pressed', 'true');
+            btn.setAttribute('aria-label', 'Pause ocean ambience');
+          }).catch(function () {
+            btn.setAttribute('aria-label', 'Ocean ambience unavailable');
+          });
+        } else {
+          audio.pause();
+          btn.classList.remove('playing');
+          btn.setAttribute('aria-pressed', 'false');
+          btn.setAttribute('aria-label', 'Play ocean ambience');
+        }
+      });
+      audio.addEventListener('ended', function () {
+        btn.classList.remove('playing');
+        btn.setAttribute('aria-pressed', 'false');
+      });
+    })();
+    (function () {
+      // Respect reduced motion: hold the ocean still on its poster frame.
+      var vid = document.getElementById('hero-video');
+      if (vid && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        vid.removeAttribute('autoplay');
+        vid.pause();
+      }
+    })();
+    (function () {
+      var els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window)) {
+        els.forEach(function (el) { el.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(function (el) { io.observe(el); });
+    })();
+  </script>
+</body>
+</html>
