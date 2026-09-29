@@ -11,7 +11,6 @@ from typing import Iterator, List, Optional
 
 from inference.types import MissionFrame
 from mission.source import MissionSource
-from mission.xtf_conversion import convert_xtf_to_png
 
 
 logger = logging.getLogger(__name__)
@@ -63,6 +62,14 @@ class RecordedMissionSource(MissionSource):
     def __iter__(self) -> Iterator[MissionFrame]:
         for idx, path in enumerate(self._frames):
             if path.suffix.lower() == ".xtf":
+                try:
+                    from mission.xtf_conversion import convert_xtf_to_png
+                except ImportError as e:
+                    raise RuntimeError(
+                        "pyxtf is not installed, so .xtf frames cannot be converted. "
+                        "Install it with 'pip install pyxtf' or use PNG/JPG frames."
+                    ) from e
+                converted_dir = self._mission_dir / "converted"
                 image_path = convert_xtf_to_png(
                     xtf_path=path,
                     output_dir=converted_dir,
@@ -71,7 +78,7 @@ class RecordedMissionSource(MissionSource):
                 image_path = path
             yield MissionFrame(
                 frame_id=path.stem,
-                image_path=str(path),
+                image_path=str(image_path),
                 mission_id=self.mission_id,
                 frame_index=idx,
                 timestamp=self._mission_meta.get("timestamps", {}).get(path.stem),
