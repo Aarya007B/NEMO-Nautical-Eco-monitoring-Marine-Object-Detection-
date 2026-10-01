@@ -3,6 +3,10 @@
 # NEMO 🌊
 ### AI-Powered Underwater Marine Debris & Anomaly Detection System
 
+> **SIH 2026 · PS ID 26057** — AI-Powered Automated Underwater Marine Debris and Anomaly Detection System using Side-Scan Sonar Imagery
+> Organisation: Ministry of Earth Sciences (MoES) · Dept: National Institute of Ocean Technology (NIOT) · Category: Software · Theme: Disaster Management
+> Team: **OnlyCracks** · Live: https://nemo-nautical-eco-monitoring-marine.vercel.app/
+
 **NEMO** is a modular, two-stage AI pipeline that ingests side-scan sonar imagery, detects man-made marine debris and anomalies, and presents findings through the NEMO mission dashboard.
 
 > **Do not treat every sonar detection as a confirmed object.** NEMO uses a two-stage pipeline to reduce false positives caused by natural seabed structures.
@@ -273,4 +277,4 @@ See `docs/FUTURE_WORK.md` for the complete research roadmap.
 }
 ```
 
-*NEMO — Built for Smart India Hackathon 2026*
+*NEMO — Built for Smart India Hackathon 2026 · Team OnlyCracks · PS ID 26057 (MoES/NIOT)*

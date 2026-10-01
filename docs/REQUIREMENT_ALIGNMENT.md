@@ -1,5 +1,8 @@
 # NEMO — Organizer Requirement Alignment
 
+> SIH 2026 · PS ID 26057 — AI-Powered Automated Underwater Marine Debris and Anomaly Detection System using Side-Scan Sonar Imagery
+> Organisation: Ministry of Earth Sciences (MoES) · Dept: NIOT · Category: Software · Theme: Disaster Management · Team: OnlyCracks
+
 This document maps the NEMO MVP capabilities to the organizer's competition requirements.
 
 ---
