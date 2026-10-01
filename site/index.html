@@ -18,6 +18,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NEMO — Finding what the ocean hides</title>
   <meta name="description" content="NEMO is an AI-powered side-scan sonar system that detects marine debris: YOLO11n proposes candidates, MobileNetV3 verifies them, every contact ships as reviewable evidence.">
+  <meta property="og:title" content="NEMO — Finding what the ocean hides">
+  <meta property="og:description" content="SIH 2026 · YOLO11n proposes, MobileNetV3 verifies. Recorded-mission prototype with measured precision 0.74 / recall 0.87.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/demo-poster.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#04090F">
+  <link rel="icon" href="assets/hero-sonar.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
@@ -301,6 +308,7 @@
       <a href="#problem">The problem</a>
       <a href="#method">How it works</a>
       <a href="#evidence">Evidence</a>
+      <a href="https://github.com/Aarya007B/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-" target="_blank" rel="noopener">GitHub</a>
       <div class="nav-cluster">
         <button class="sound-toggle" id="sound-toggle" aria-label="Play ocean ambience" aria-pressed="false">
           <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 4 20 12 6 20" fill="currentColor" stroke="none"/></svg>
@@ -325,9 +333,11 @@
       <h1>What the ocean hides, <em>NEMO finds.</em></h1>
       <p class="hero-lede">Every survey mission returns hours of seabed sonar that no human team can fully review. NEMO (<strong>Nautical Eco-monitoring Marine Object detection</strong>) flags candidate debris automatically and verifies each contact, so inspection and cleanup crews start from evidence instead of empty water.</p>
       <div class="hero-ctas">
-        <a class="btn btn-primary" href="#demo">Watch the console demo</a>
+        <a class="btn btn-primary" href="#demo">Watch recorded demo</a>
         <a class="btn btn-ghost" href="#method">How it works</a>
+        <a class="btn btn-ghost" href="https://github.com/Aarya007B/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-" target="_blank" rel="noopener">View GitHub</a>
       </div>
+      <p style="font-family:var(--font-mono);font-size:12px;color:var(--silt);margin-top:18px;letter-spacing:0.02em;">SIH 2026 · SMART INDIA HACKATHON 2026 · RECORDED-MISSION PROTOTYPE · YOLO11n + MOBILENETV3 · <a href="https://github.com/Aarya007B/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-" target="_blank" rel="noopener" style="color:var(--phosphor);text-decoration:none;">CODE + EXPERIMENTS →</a></p>
     </div>
     <div class="scroll-cue" aria-hidden="true">DESCEND</div>
   </header>
@@ -457,9 +467,9 @@
     <section class="block evidence" id="demo">
       <div class="wrap">
         <div class="block-head reveal">
-          <div class="kicker">Live console demo</div>
+          <div class="kicker">Recorded console demo</div>
           <h2>Watch NEMO run a real mission.</h2>
-          <p>This recording walks through a real run: <strong>create mission → analysis → geospatial view → reports</strong>.</p>
+          <p>This is a <strong>recording of a real run</strong> (not a live backend on this static site): <strong>create mission → analysis → geospatial view → reports</strong>. To run it yourself, clone the repo and start the API locally.</p>
         </div>
         <div class="reveal" id="demo-frame" style="position:relative;border:1px solid var(--ink-line);border-radius:14px;overflow:hidden;background:#000;">
           <video id="demo-video" controls preload="metadata" poster="assets/demo-poster.jpg" style="display:block;width:100%;height:auto;background:#000;">
@@ -471,6 +481,17 @@
             <svg id="demo-icon-pause" width="30" height="30" viewBox="0 0 24 24" fill="#04241B" aria-hidden="true" style="display:none;"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
           </button>
         </div>
+        <div class="reveal" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:26px;">
+          <a class="btn btn-primary" href="https://github.com/Aarya007B/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-" target="_blank" rel="noopener">Run it locally — GitHub</a>
+          <a class="btn btn-ghost" href="about.html">Read the method</a>
+        </div>
+        <div class="reveal" style="margin-top:22px;border:1px solid var(--ink-line);border-radius:12px;background:var(--abyss-2);padding:20px 22px;">
+          <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;color:var(--phosphor-deep);margin-bottom:10px;">RUN LOCALLY · FASTAPI + CONSOLE · ~3 MIN</div>
+          <pre style="font-family:var(--font-mono);font-size:13px;line-height:1.8;color:var(--foam);white-space:pre-wrap;margin:0;">git clone https://github.com/Aarya007B/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-.git
+pip install -r requirements.txt
+python main.py --mode api --config configs/config.yaml
+<span style="color:var(--silt);"># then open http://localhost:8000/console</span></pre>
+        </div>
       </div>
     </section>
 
@@ -478,9 +499,10 @@
       <div class="wrap">
         <div class="kicker centered reveal">Take the watch</div>
         <h2 class="reveal">The next contact is already on the seabed.</h2>
-        <p class="reveal">Create a mission from your own sonar frames, pair navigation data, and watch candidates become evidence. Built for operators, researchers, and the crews who clean up after all of us.</p>
+        <p class="reveal">This static site hosts the story and a recorded run. The working console runs locally from the open-source repo — clone it, process the sample mission, and watch candidates become evidence. Built for operators, researchers, and the crews who clean up after all of us.</p>
         <div class="hero-ctas reveal" style="justify-content:center;">
-          <a class="btn btn-primary" href="#demo">Watch the console demo</a>
+          <a class="btn btn-primary" href="https://github.com/Aarya007B/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-" target="_blank" rel="noopener">View GitHub + run locally</a>
+          <a class="btn btn-ghost" href="#demo">Watch the recording</a>
           <a class="btn btn-ghost" href="about.html">Read the method</a>
         </div>
       </div>
@@ -489,8 +511,8 @@
 
   <footer>
     <div class="wrap" style="display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;width:100%;">
-      <span>NEMO · v0.1.0-mdp · prototype · not for operational deployment</span>
-      <span><a href="#demo">Console</a><a href="about.html">Method</a><a href="#top">Surface ↑</a></span>
+      <span>NEMO · SIH 2026 · v0.1.0-mdp · prototype · not for operational deployment</span>
+      <span><a href="#demo">Recorded demo</a><a href="about.html">Method</a><a href="https://github.com/Aarya007B/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-" target="_blank" rel="noopener">GitHub</a><a href="#top">Surface ↑</a></span>
     </div>
   </footer>
 
