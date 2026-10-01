@@ -17,6 +17,15 @@
 
 Selected based on controlled T1–T4 ablation experiments. See `docs/EXPERIMENT_RESULTS.md` for full results.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/nemo-architecture.stage.dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/architecture/nemo-architecture.stage.light.png">
+  <img src="docs/architecture/nemo-architecture.stage.dark.png" alt="NEMO validated MVP architecture: mission frames flow into YOLO11n-1C candidate detection and MobileNetV3 verification, nav logs join at metadata alignment for GPS-tagged reports">
+</picture>
+
+<details>
+<summary>Text version of the pipeline</summary>
+
 ```
 Native 1-Channel Sonar Input
         |
@@ -53,6 +62,8 @@ Native 1-Channel Sonar Input
   NEMO     JSON / CSV
 Dashboard   Report
 ```
+
+</details>
 
 ---
 

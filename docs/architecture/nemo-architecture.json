@@ -31,7 +31,7 @@
       "id": "mission-metadata",
       "type": "external",
       "label": "Mission",
-      "sublabel": "",
+      "sublabel": "frames + nav",
       "pos": [
         20,
         370
@@ -230,7 +230,34 @@
       "id": "sonar-to-native1c",
       "from": "side-scan-sonar",
       "to": "native-1c",
+      "label": "sonar frames",
       "variant": "emphasis"
+    },
+    {
+      "id": "mission-frames-to-native1c",
+      "from": "mission-metadata",
+      "to": "native-1c",
+      "label": "mission frames",
+      "variant": "default"
+    },
+    {
+      "id": "mission-nav-to-metadata",
+      "from": "mission-metadata",
+      "to": "metadata-align",
+      "label": "nav logs for GPS",
+      "variant": "default",
+      "fromSide": "bottom",
+      "toSide": "bottom",
+      "via": [
+        [
+          57.5,
+          445
+        ],
+        [
+          750.5,
+          445
+        ]
+      ]
     },
     {
       "id": "native1c-to-yolo",
@@ -312,7 +339,6 @@
       "items": [
         "Confidence / Priority scoring fuses detector confidence and verifier artificial probability",
         "Metadata alignment uses timestamp nearest-neighbor matching for GPS coordinates",
-        "Mission metadata is associated with detections via timestamp alignment",
         "Geolocation maps latitude/longitude; Reporting exports structured JSON and CSV records"
       ]
     },
@@ -322,7 +348,7 @@
       "items": [
         "FastAPI serves as the REST API layer with mission processing, detection, and export endpoints",
         "NEMO Dashboard provides mission upload, sonar visualization, detection inspection, map view, and report export",
-        "Primary path: SONAR to YOLO11n-1C to MobileNetV3 to Scoring to Geolocation to Reporting to Dashboard"
+        "Primary path: MISSION frames to YOLO11n-1C to MobileNetV3 to Scoring to Geolocation to Reporting to Dashboard; nav logs join at Metadata alignment"
       ]
     }
   ]
