@@ -273,4 +273,4 @@ See `docs/FUTURE_WORK.md` for the complete research roadmap.
 }
 ```
 
-*NEMO — Built for Smart India Hackathon 2025*
+*NEMO — Built for Smart India Hackathon 2026*
