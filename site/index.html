@@ -99,22 +99,36 @@
     }
     .nav-links a:not(.btn):hover { color: var(--foam); }
     .sound-toggle {
-      width: 44px; height: 44px;
-      border-radius: 50%;
+      height: 44px;
+      padding: 0 16px;
+      gap: 8px;
+      border-radius: 999px;
       background: rgba(8, 18, 32, 0.72);
       border: 1px solid var(--ink-line-strong);
       color: var(--murk);
       cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center;
-      transition: color 180ms var(--ease-out), border-color 180ms var(--ease-out), background 180ms var(--ease-out);
-      padding: 0;
+      font-family: var(--font-plate);
+      font-size: 13px; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      white-space: nowrap;
+      transition: color 180ms var(--ease-out), border-color 180ms var(--ease-out), background 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
     }
     .sound-toggle:hover { color: var(--phosphor); border-color: var(--phosphor); }
-    .sound-toggle.playing { color: var(--phosphor); border-color: var(--phosphor); background: var(--phosphor-wash); }
-    .sound-toggle svg { width: 18px; height: 18px; }
+    .sound-toggle.playing { color: var(--phosphor); border-color: var(--phosphor); background: rgba(60, 245, 200, 0.08); }
+    .sound-toggle svg { width: 16px; height: 16px; flex: none; }
     .sound-toggle .icon-pause { display: none; }
     .sound-toggle.playing .icon-pause { display: block; }
     .sound-toggle.playing .icon-play { display: none; }
+    .sound-toggle .sound-label { line-height: 1; }
+    @keyframes sound-hint {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(60, 245, 200, 0); }
+      50% { box-shadow: 0 0 0 6px rgba(60, 245, 200, 0.22); border-color: var(--phosphor); }
+    }
+    .sound-toggle.hint { animation: sound-hint 1.6s ease-in-out 2; }
+    @media (prefers-reduced-motion: reduce) {
+      .sound-toggle.hint { animation: none; }
+    }
     .nav-cluster { display: flex; align-items: center; gap: 14px; }
     .btn {
       display: inline-block;
@@ -297,6 +311,8 @@
       .wrap { padding: 0 22px; }
       .nav { padding: 14px 22px; }
       .hero-inner { padding-left: 22px; padding-right: 22px; }
+      .sound-toggle { padding: 0 12px; }
+      .sound-toggle .sound-label { display: none; }
     }
   </style>
 </head>
@@ -310,11 +326,12 @@
       <a href="#evidence">Evidence</a>
       <a href="https://github.com/Aarya007B/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-" target="_blank" rel="noopener">GitHub</a>
       <div class="nav-cluster">
-        <button class="sound-toggle" id="sound-toggle" aria-label="Play ocean ambience" aria-pressed="false">
+        <button class="sound-toggle hint" id="sound-toggle" aria-label="Play ocean ambience" aria-pressed="false" title="Toggle ocean ambience sound">
           <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 4 20 12 6 20" fill="currentColor" stroke="none"/></svg>
           <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+          <span class="sound-label" id="sound-label">Sound off</span>
         </button>
-        <a class="btn btn-primary" href="#demo">Watch the console demo</a>
+        <a class="btn btn-primary" href="#demo">Watch recorded demo</a>
       </div>
     </div>
   </nav>
@@ -520,26 +537,32 @@ python main.py --mode api --config configs/config.yaml
     (function () {
       var btn = document.getElementById('sound-toggle');
       var audio = document.getElementById('ocean-audio');
+      var label = document.getElementById('sound-label');
       if (!btn || !audio) return;
+      function clearHint() { btn.classList.remove('hint'); }
+      setTimeout(clearHint, 7000);
+      function setState(playing) {
+        btn.classList.toggle('playing', playing);
+        btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+        btn.setAttribute('aria-label', playing ? 'Pause ocean ambience' : 'Play ocean ambience');
+        if (label) label.textContent = playing ? 'Sound on' : 'Sound off';
+      }
       btn.addEventListener('click', function () {
+        clearHint();
         if (audio.paused) {
           audio.play().then(function () {
-            btn.classList.add('playing');
-            btn.setAttribute('aria-pressed', 'true');
-            btn.setAttribute('aria-label', 'Pause ocean ambience');
+            setState(true);
           }).catch(function () {
             btn.setAttribute('aria-label', 'Ocean ambience unavailable');
+            if (label) label.textContent = 'Unavailable';
           });
         } else {
           audio.pause();
-          btn.classList.remove('playing');
-          btn.setAttribute('aria-pressed', 'false');
-          btn.setAttribute('aria-label', 'Play ocean ambience');
+          setState(false);
         }
       });
       audio.addEventListener('ended', function () {
-        btn.classList.remove('playing');
-        btn.setAttribute('aria-pressed', 'false');
+        setState(false);
       });
     })();
     (function () {
