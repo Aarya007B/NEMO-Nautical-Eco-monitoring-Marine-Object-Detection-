@@ -9,6 +9,7 @@
 | REMARO OpenSonarDatasets | Sonar images | `opensonardatasets.py` |
 | DFKI-RIC UXO 2024 | Sonar images + annotations | `dfki_uxo.py` |
 | UCI Sonar Mines vs Rocks | Feature vectors (no images) | `uci_sonar.py` |
+| AI4Shipwrecks | Side-scan strips + masks (shipwreck) | convert via `tools/convert_ai4shipwrecks.py` |
 
 ## Dataset Scope
 
@@ -25,6 +26,20 @@ Place raw datasets in `data/raw/<dataset_name>/`. Do NOT modify originals.
 ```bash
 python tools/convert_dataset.py --dataset seabedobjects --root data/raw/seabedobjects
 ```
+
+## AI4Shipwrecks (shipwreck expansion)
+
+1. Download the dataset from https://umfieldrobotics.github.io/ai4shipwrecks/
+   (expects `{train,test}/images`, `{train,test}/labels`, `extras/terrain/`).
+2. Convert strips + masks to NEMO YOLO format (class 3 = shipwreck):
+
+```bash
+python tools/convert_ai4shipwrecks.py --src ~/Downloads/AI4Shipwrecks
+```
+
+Output lands in `data/raw/ai4shipwrecks/{train,valid}/{images,labels}/` (git-ignored,
+regenerate locally — do not commit). Training configs live in
+`data/raw/combined_nemo_ai4/` (`data.yaml` for local runs, `data_colab.yaml` for Colab).
 
 ## Splits
 

@@ -1,0 +1,10 @@
+train:
+  - /Users/aaryabalaji/Desktop/NEMO/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-/data/raw/seabedobjects/train/images
+  - /Users/aaryabalaji/Desktop/NEMO/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-/data/raw/ai4shipwrecks/train/images
+val:
+  - /Users/aaryabalaji/Desktop/NEMO/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-/data/raw/seabedobjects/valid/images
+  - /Users/aaryabalaji/Desktop/NEMO/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-/data/raw/ai4shipwrecks/valid/images
+test: /Users/aaryabalaji/Desktop/NEMO/NEMO-Nautical-Eco-monitoring-Marine-Object-Detection-/data/raw/seabedobjects/test/images
+
+nc: 4
+names: ['aircraft', 'fish', 'other', 'shipwreck']

@@ -33,6 +33,8 @@ data/raw/opensonardatasets/*
 data/raw/dfki_uxo/*
 data/raw/uci_sonar/*
 data/raw/other/*
+data/raw/ai4shipwrecks/*
+data/src/*
 !data/raw/**/.gitkeep
 
 # Processed

@@ -1,0 +1,10 @@
+train:
+  - /content/nemo/data/raw/seabedobjects/train/images
+  - /content/nemo/data/raw/ai4shipwrecks/train/images
+val:
+  - /content/nemo/data/raw/seabedobjects/valid/images
+  - /content/nemo/data/raw/ai4shipwrecks/valid/images
+test: /content/nemo/data/raw/seabedobjects/test/images
+
+nc: 4
+names: ['aircraft', 'fish', 'other', 'shipwreck']
